@@ -1,5 +1,4 @@
-import React from 'react'
-
+import React, { useState } from 'react'
 const Stream = () => {
     const styles = {
         headerImage: {
@@ -49,6 +48,37 @@ const Stream = () => {
             height: "40px",
         },
     };
+
+    const Codestyles = {
+        code: {
+            fontSize: "72px",
+            color: "#3c4043",
+            margin: "20px 0",
+            textAlign: "center"
+        },
+        footer: {
+            fontSize: "14px",
+            color: "#5f6368",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+        },
+        link: {
+            color: "#1a73e8",
+            textDecoration: "none",
+        },
+        closeIcon: {
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            fontSize: "18px",
+            cursor: "pointer",
+        },
+    };
+    const [codePopUp, setCodePop] = useState(false);
+    console.log(codePopUp)
+
+    const toggleCodePopUp = () => setCodePop(!codePopUp)
     return (
         <>
             <div style={styles.headerImage}>
@@ -62,7 +92,7 @@ const Stream = () => {
                         <h6>Class code</h6>
                         <div className="d-flex align-items-center">
                             <span style={styles.code}>vjft3ua</span>
-                            <i className="fas fa-expand ms-2"></i>
+                            <i className="fas fa-expand ms-2" onClick={toggleCodePopUp} ></i>
                         </div>
                     </div>
                     <div style={styles.card}>
@@ -110,6 +140,39 @@ const Stream = () => {
                     </div>
                 </div>
             </div>
+
+            { /* Code Pop Up Modal */}
+            {codePopUp && <div className="modal-backdrop fade show"></div>}
+            <div
+                className={`modal fade ${codePopUp ? "show" : ""}`}
+                style={{ display: codePopUp ? "block" : "none" }}
+                tabIndex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                        <div className="modal-body">
+
+                            <div style={Codestyles.closeIcon} onClick={toggleCodePopUp}>&times;</div>
+                            <div style={{ textAlign: "center" }}>Class code</div>
+                            <div style={Codestyles.code}>vjft3ua</div>
+                            <div style={Codestyles.footer}>
+                                <div>sdsd</div>
+                                <div>
+                                    <i className="far fa-copy"></i>
+                                    <a href="#" style={Codestyles.link}>
+                                        Copy invite link
+                                    </a>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </>
     )
 }

@@ -5,19 +5,19 @@ import QuizAssingment from "../classwork/QuizAssingment";
 import Material from "../classwork/Material";
 const ClassWork = () => {
   const [AssingmentModal, setAssingmentModal] = useState(false);
-  const [QuizAssingmentModal , setQuizAssingmentModal ] = useState(false);
-  const [MaterialModal , setMaterialModal ] = useState(false);
+  const [QuizAssingmentModal, setQuizAssingmentModal] = useState(false);
+  const [MaterialModal, setMaterialModal] = useState(false);
 
 
   // Handle Assingment Modal PopUp
   const toggleAssingmentModal = () => setAssingmentModal(!AssingmentModal);
 
   //Handle Quiz Assingment Modal PopUp
-  const toggleQuizAssingmentModal = ()=> setQuizAssingmentModal(!QuizAssingmentModal)
+  const toggleQuizAssingmentModal = () => setQuizAssingmentModal(!QuizAssingmentModal)
 
-   //Handle Material Modal PopUp
-   const toggleMaterialModal = ()=>setMaterialModal(!MaterialModal)
-   
+  //Handle Material Modal PopUp
+  const toggleMaterialModal = () => setMaterialModal(!MaterialModal)
+
   return (
     <div className="d-flex justify-content-center align-items-center mt-4">
       <div className="text-center">
@@ -94,7 +94,7 @@ const ClassWork = () => {
                 <i
                   className="fa fa-times"
                   aria-hidden="true"
-                  style={{ color: "white" , fontSize : "22px" }} // Set icon color to white
+                  style={{ color: "white", fontSize: "22px" }} // Set icon color to white
                 ></i>
               </button>
             </div>
@@ -135,7 +135,7 @@ const ClassWork = () => {
                 <i
                   className="fa fa-times"
                   aria-hidden="true"
-                  style={{ color: "white" , fontSize : "22px" }} // Set icon color to white
+                  style={{ color: "white", fontSize: "22px" }} // Set icon color to white
                 ></i>
               </button>
             </div>
@@ -148,7 +148,7 @@ const ClassWork = () => {
       </div>
 
       {/* Material Modal */}
-      { MaterialModal && <div className="modal-backdrop fade show"></div>}
+      {MaterialModal && <div className="modal-backdrop fade show"></div>}
       <div
         className={`modal fade ${MaterialModal ? "show" : ""}`}
         style={{ display: MaterialModal ? "block" : "none" }}
@@ -176,13 +176,13 @@ const ClassWork = () => {
                 <i
                   className="fa fa-times"
                   aria-hidden="true"
-                  style={{ color: "white" , fontSize : "22px" }} // Set icon color to white
+                  style={{ color: "white", fontSize: "22px" }} // Set icon color to white
                 ></i>
               </button>
             </div>
 
             <div className="modal-body">
-              <Material toggleMaterialModal = {toggleMaterialModal}/> 
+              <Material toggleMaterialModal={toggleMaterialModal} />
             </div>
           </div>
         </div>
