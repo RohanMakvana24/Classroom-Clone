@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from "react-router-dom";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
@@ -69,7 +69,7 @@ export const StarterPage = () => {
       </div>
 
       {/* Button */}
-      <Link to="/login" className="btn btn-success px-5">
+      <Link to="/login" className="btn btn-success px-5 hoverLink">
         Get Started
       </Link>
     </div>

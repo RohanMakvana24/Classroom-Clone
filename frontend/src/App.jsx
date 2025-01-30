@@ -11,7 +11,7 @@ import OTPVerification from './pages/Authentication/OTPVerification';
 import OneClassPage from './pages/OneClassPage';
 import SettingPage from './pages/SettingPage';
 import ProfilePage from './pages/ProfilePage';
-
+import "./App.css"
 function App() {
   return (
     <Routes>
