@@ -75,7 +75,7 @@ const messageList = {
 
 // Create HTTP Response function //
 function HTTP_Response(status, message = messageList[status]) {
-  let error =  Error(message || "Unkonwn Status Code" );
+  let error = new Error(message || "Unkonwn Status Code" );
   error.status = status;
   return error;
 }

@@ -6,10 +6,10 @@ const ForgotPassword = () => {
   //handle Form Using The Formik
   const formik = useFormik({
     initialValues: { email: "" },
-    validationSchema : ForgotPasswordSchma,
-    onSubmit : (values)=>{
-      console.log(values)
-    }
+    validationSchema: ForgotPasswordSchma,
+    onSubmit: (values) => {
+      console.log(values);
+    },
   });
   return (
     <div
@@ -53,7 +53,7 @@ const ForgotPassword = () => {
           </p>
         </div>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={formik.handleSubmit}
           style={{
             padding: "18px",
             marginLeft: "8px",
@@ -67,18 +67,24 @@ const ForgotPassword = () => {
             </label>
             <input
               type="email"
-              className="form-control"
+              className={`form-control ${formik.touched.email && formik.errors.email ? "is-invalid" : ""}`}
               id="email"
               placeholder="e.g. john@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               style={{
-                border: "2px solid #dee2e6",
                 borderRadius: "4px",
                 padding: "10px", // Padding added inside the input field
               }}
-              required
             />
+            {formik.touched.email && formik.errors.email && (
+              <div
+                style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}
+              >
+                {formik.errors.email}
+              </div>
+            )}
           </div>
           <button
             type="submit"
