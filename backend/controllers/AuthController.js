@@ -4,10 +4,11 @@ import uploadToCloudinary from "../utils/CloudinaryUploader.js";
 import UserModel from "../models/UserModel.js";
 import sendMail from "../services/emailService/emailServies.js";
 import EmailTemplte from "../templates/emailTemplate.js";
+import {v4 as uuidv4 } from 'uuid'
+
+
 export const SignupUser = async (req, res) => {
   try {
-
-    const ip= req.ip;
     // ~ Validation Errors ~
     const errros = validationResult(req);
     if(!errros.isEmpty()){
@@ -29,24 +30,24 @@ export const SignupUser = async (req, res) => {
 
     // ~ Profile Uploading
     const fileDetails = await uploadToCloudinary(req.file.path , req.file.originalname)
-   
-    const subject = "Verification of login";
-    const timestamp = new Date().toISOString();
-    const htmlContent = EmailTemplte(email,ip,timestamp);
+    const verificationToken = uuidv4();
+    const subject = "Verification of your account..";
 
-   sendMail(email , subject,htmlContent,res )
+    const htmlContent = EmailTemplte(email,verificationToken,fullname);
+
+   sendMail(email , subject, htmlContent , verificationToken ,res )
+
     // ~ Store Data 
-    // await UserModel.create({
-    //   fullname : fullname,
-    //   email : email,
-    //   password : password,
-    //   profile : {
-    //     url : fileDetails.secure_url,
-    //     public_id : fileDetails.public_id
-    //   }
-    // })
-
- 
+   const newUser=  await UserModel.create({
+      fullname : fullname,
+      email : email,
+      password : password,
+      profile : {
+        url : fileDetails.secure_url,
+        public_id : fileDetails.public_id
+      },
+      verificationToken : verificationToken
+    })
     return res.status(200).json({
       success : true,
       message : "The User Ragistered Succefully"
@@ -56,3 +57,45 @@ export const SignupUser = async (req, res) => {
     throw HTTP_Response(504, error.message);
   }
 };
+
+
+export const VerifyUser = async (req,res)=>{
+  try {
+    const verificationToken = req.params.verificationToken;
+    
+    // ~ Validation
+    if(!verificationToken){
+      return res.status(403).json({
+        success :false,
+        message : "Verification Token is required"
+      })
+    }
+    const user = await UserModel.findOne({
+      verificationToken : verificationToken
+    })
+
+    if(!user){
+      return res.status(403).json({
+        success :false,
+        message : " Verification Issue: The provided email was not found or has already been verified."
+      })
+    }
+
+    await UserModel.findByIdAndUpdate(user._id , {
+      verified : true,
+      verificationToken : ''
+    })
+
+    res.status(200).json({
+      succecc: true,
+      message:
+        "Email Verification Successful: Your email has been successfully verified. You can now access and enjoy our services. Thank you for confirming your email!",
+    });
+
+  } catch (error) {
+    res.status(504).json({
+      succecc: false,
+      message: error.message,
+    });
+  }
+}

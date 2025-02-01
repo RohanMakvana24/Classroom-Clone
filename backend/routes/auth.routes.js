@@ -1,6 +1,6 @@
 import express from 'express'
 import {body} from 'express-validator'
-import { SignupUser } from '../controllers/AuthController.js';
+import { SignupUser, VerifyUser } from '../controllers/AuthController.js';
 import upload from '../services/multer.js';
 const AuthRoutes = express.Router();
 
@@ -26,5 +26,8 @@ AuthRoutes.post("/signup", upload.single('profile') , [
         .matches(/[!@#$%^&*(),.?":{}|<>]/)
         .withMessage("Password must contain at least one special character"),
 ], SignupUser);
+
+// ~ Verification Route 🚦💨 ~ //
+AuthRoutes.get("/verify/:verificationToken" , VerifyUser )
 
 export default AuthRoutes;
