@@ -9,6 +9,7 @@ import {v4 as uuidv4 } from 'uuid'
 
 export const SignupUser = async (req, res) => {
   try {
+
     // ~ Validation Errors ~
     const errros = validationResult(req);
     if(!errros.isEmpty()){
@@ -48,9 +49,11 @@ export const SignupUser = async (req, res) => {
       },
       verificationToken : verificationToken
     })
+    const token = newUser.generateAuthToken();
     return res.status(200).json({
       success : true,
-      message : "The User Ragistered Succefully"
+      message : "The User Ragistered Succefully",
+      token : token
     })
   } catch (error) {
     console.log(error);
@@ -87,7 +90,7 @@ export const VerifyUser = async (req,res)=>{
     })
 
     res.status(200).json({
-      succecc: true,
+      success: true,
       message:
         "Email Verification Successful: Your email has been successfully verified. You can now access and enjoy our services. Thank you for confirming your email!",
     });

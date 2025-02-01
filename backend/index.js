@@ -6,7 +6,7 @@ import HandleGlobalError from "./middleware/errorMidleware.js";
 import AuthRoutes from "./routes/auth.routes.js";
 import HTTP_Response from "./utils/HttpResponse.js";
 import cloudinary from "./config/cloudinaryConfig.js";
-
+import cors from 'cors'
 
 // ✌︎︎ Dotenv Configuration ✌︎︎ // 
 configDotenv.config({ path : "./config/.env"})
@@ -19,8 +19,15 @@ const server = express();
 const port = process.env.PORT;
 
 // ✌︎︎ Middleware ✌︎︎ // 
+const corsOptions = {
+    origin: "http://localhost:5173", // Replace with your React frontend URL
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true, // Allow cookies or authentication headers
+  };
+  
 server.use(express.json())
-
+server.use(cors(corsOptions))
 // ✌︎︎ Routes ✌︎︎ // 
 server.use("/api/v1/auth" , AuthRoutes)
 server.use((err,req,res,next)=>{

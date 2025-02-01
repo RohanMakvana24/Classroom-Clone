@@ -1,8 +1,7 @@
-import mongoose, { mongo } from "mongoose";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-// ☕︎ User Schema Create ☕︎ //
-
+import mongoose from "mongoose";
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+// ☕︎ User Schema with Methods ☕︎ //
 // ☕︎ Profile Schema ☕︎ //
 const profileSchema = new mongoose.Schema({
   url: {
@@ -19,7 +18,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "FullName is required"],
       trim: true,
-      minlength: [5, "The FullName must be at leats 5 character"],
+      minlength: [5, "The FullName must be at least 5 characters"],
     },
     email: {
       type: String,
@@ -36,8 +35,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "The Passsword is required"],
-      minlength: [8, "The Password length must be at least 8 charcater"],
+      required: [true, "The Password is required"],
+      minlength: [8, "The Password length must be at least 8 characters"],
       validate: {
         validator: function (v) {
           return (
@@ -58,8 +57,8 @@ const userSchema = new mongoose.Schema(
       enum: [true, false],
       default: false,
     },
-    verificationToken : {
-      type : String
+    verificationToken: {
+      type: String,
     },
     profile: profileSchema,
   },
@@ -67,8 +66,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-//-------------------------- Methods -----------------------//
 
 // ☕︎ Password Hashing ☕︎ //
 userSchema.pre("save", async function (next) {
@@ -83,8 +80,8 @@ userSchema.methods.isPasswordValid = async function (oldPassword) {
   return await bcrypt.compare(oldPassword, this.password);
 };
 
-// ☕︎ Generates JWT Auth Token ☕︎ //
-userSchema.method.generateAuthToken = async function () {
+// ☕︎ Generate JWT Token ☕︎ //
+userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign({ id: this._id }, process.env.JWTSECRETKEY);
   return token;
 };

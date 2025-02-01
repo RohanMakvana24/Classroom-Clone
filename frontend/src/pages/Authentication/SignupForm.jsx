@@ -5,14 +5,42 @@ import { Link } from "react-router-dom";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useFormik } from "formik";
 import SignupSchema from "../../ValidationSchema/Authentication/SignupSchema";
-
+import axios from "axios";
+import toast from "react-hot-toast";
 const SignupForm = () => {
   // Formik To handle Singup Form
   const formik = useFormik({
-    initialValues: { fullname: "", email: "", password: "", profile: "" },
+    initialValues: { fullname: "", email: "", password: "", profile: null },
     validationSchema: SignupSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      try {
+        const formData = new FormData();
+        formData.append("fullname", values.fullname);
+        formData.append("email", values.email);
+        formData.append("password", values.password);
+        formData.append("profile", values.profile);
+
+        const response = await axios.post(
+          `${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/signup`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        console.log(response);
+      } catch (error) {
+        if (error) {
+          if (error.response?.data?.message) {
+            toast.error(
+              error.response.data.message || "Signup failed! Please try again."
+            );
+          }
+        } else {
+          toast.error("Somenthin Went Wrong");
+        }
+      }
     },
   });
 
@@ -49,8 +77,12 @@ const SignupForm = () => {
             type="text"
             id="fullname"
             name="fullname"
-            style={{ fontSize : "13px" , height : "40px"}}
-            className={`form-control ${formik.touched.fullname && formik.errors.fullname ? "is-invalid" : ""}`}
+            style={{ fontSize: "13px", height: "40px" }}
+            className={`form-control ${
+              formik.touched.fullname && formik.errors.fullname
+                ? "is-invalid"
+                : ""
+            }`}
             value={formik.values.fullname}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -70,9 +102,11 @@ const SignupForm = () => {
           <input
             type="email"
             id="email"
-            style={{ fontSize : "13px" , height : "40px"}}
+            style={{ fontSize: "13px", height: "40px" }}
             name="email"
-            className={`form-control ${formik.touched.email && formik.errors.email ? 'is-invalid' : ''}`}
+            className={`form-control ${
+              formik.touched.email && formik.errors.email ? "is-invalid" : ""
+            }`}
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -93,8 +127,12 @@ const SignupForm = () => {
           <input
             type="password"
             id="password"
-            className={`form-control ${formik.touched.password && formik.errors.password ? 'is-invalid' : ''}`}
-            style={{ fontSize : "13px" , height : "40px"}}
+            className={`form-control ${
+              formik.touched.password && formik.errors.password
+                ? "is-invalid"
+                : ""
+            }`}
+            style={{ fontSize: "13px", height: "40px" }}
             name="password"
             value={formik.values.password}
             onChange={formik.handleChange}
@@ -116,7 +154,11 @@ const SignupForm = () => {
             type="file"
             id="profile-image"
             name="profile"
-            className={`form-control ${formik.touched.profile && formik.errors.profile ? 'is-invalid' : ''}`}
+            className={`form-control ${
+              formik.touched.profile && formik.errors.profile
+                ? "is-invalid"
+                : ""
+            }`}
             onChange={(event) => {
               const profile = event.currentTarget.files[0];
               formik.setFieldValue("profile", profile);

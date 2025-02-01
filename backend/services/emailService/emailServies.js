@@ -7,13 +7,15 @@ export const sendMail = async (toEmail, subject, htmlContent, res) => {
     let transporter = nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
       port: 587,
-      secure: false,
+      secure: false, 
       auth: {
         user: "7888f4003@smtp-brevo.com",
         pass: "IhK0HYkaJAXBmbxU",
       },
+      tls: {
+        rejectUnauthorized: false, // Disable strict SSL check
+      },
     });
-
     let info = await transporter.sendMail({
       from: "rohanmakvana90@gmail.com",
       to: toEmail,
