@@ -136,3 +136,35 @@ export const isVerifiedUser = async (req,res)=>{
     })
   }
 }
+
+// ~ Delete User ~ //
+export const deleteUser = async(req,res)=>{
+  try {
+    const u_id = req.params.id;
+    if(!u_id){
+      return res.status(400).json({
+        success : false,
+        message : "User id is required"
+      })
+    }
+
+    const isDeleteUser = await UserModel.findByIdAndDelete(u_id);
+    if(isDeleteUser){
+      return res.status(200).json({
+        success : true,
+        message : "The User Deleted Succefully"
+      })
+    }else{
+      return res.status(400).json({
+        success : false,
+        message : "The Not User Deleted..."
+      })
+    }
+  } catch (error) {
+    console.loh(error)
+    res.status(504).json({
+      success : false ,
+      message : error.message
+    })
+  }
+}

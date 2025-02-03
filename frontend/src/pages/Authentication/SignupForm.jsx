@@ -8,11 +8,11 @@ import SignupSchema from "../../ValidationSchema/Authentication/SignupSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import EmailVerification from "./EmailVerification";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
   const navigate = useNavigate();
- 
+
   // ☕︎ Signup And Verification Hide and Show ☕︎ //
   const [isSignupSuccessfull, setIsSignupSuccessful] = useState(() => {
     return localStorage.getItem("isSignupSuccessfull") === "true";
@@ -21,23 +21,23 @@ const SignupForm = () => {
     localStorage.setItem("isSignupSuccessfull", isSignupSuccessfull);
   }, [isSignupSuccessfull]);
 
-  useEffect(()=>{
+  useEffect(() => {
     let interval;
-    if(isSignupSuccessfull){
-      interval = setInterval(()=>{
+    if (isSignupSuccessfull) {
+      interval = setInterval(() => {
         checkVerificationStatus();
-      },4000)
+      }, 4000);
     }
-    return ()=>{
-      if(interval)  clearInterval(interval);
-    }
-  },[isSignupSuccessfull])
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isSignupSuccessfull]);
 
   // ~~~~~~~~~~~~~~~~~~~~ Section End ~~~~~~~~~~~~~~~~~~~~~~ //
 
-  const [timeLeft, setTimeLeft] = useState(()=>{
-    const savedTime = localStorage.getItem('signupTimer');
-    if(savedTime){
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedTime = localStorage.getItem("signupTimer");
+    if (savedTime) {
       const timeDiff = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
       return Math.max(120 - timeDiff, 0);
     }
@@ -45,27 +45,57 @@ const SignupForm = () => {
   });
 
   useEffect(() => {
-    if(!isSignupSuccessfull) return;
+    if (!isSignupSuccessfull) return;
 
-    if (timeLeft === 120){
+    if (timeLeft === 120) {
       localStorage.setItem("signupTimer", Date.now().toString());
     }
     if (timeLeft === 0) return;
 
-    const timer = setInterval(() => {
+    const timer = setInterval(async () => {
+      const userId = localStorage.getItem("u_id");
+
       setTimeLeft((prevTime) => {
         const newTime = prevTime - 1;
         if (newTime <= 0) {
           clearInterval(timer);
-          localStorage.removeItem("signupTimer");0
-          console.log("stop")
+          localStorage.removeItem("signupTimer");
+          console.log("Stop");
+          // Delete User API
+          // Call the delete API
+          const deleteUser = async () => {
+            try {
+              const response = await axios.delete(
+                `${
+                  import.meta.env.VITE_APP_BASE_URL
+                }/api/v1/auth/deleteUser/${userId}`
+              );
+              console.log(response);
+
+              if (response.data.success) {
+                toast.success(response.data.message);
+                setIsSignupSuccessful(false);
+                localStorage.removeItem("u_id");
+                console.log("OK DONE BHIA ");
+              } else {
+                toast.error(response.data.message);
+              }
+            } catch (error) {
+              toast.error(
+                error.response?.data?.message ||
+                  "Something went wrong. Try again!"
+              );
+            }
+          };
+
+          deleteUser();
         }
         return newTime;
       });
     }, 1000);
 
     return () => clearInterval(timer); // Cleanup on unmount
-  }, [timeLeft , isSignupSuccessfull]);
+  }, [timeLeft, isSignupSuccessfull]);
 
   // ☕︎ Signup Form Submiting Handler ☕︎ //
   const formik = useFormik({
@@ -89,9 +119,9 @@ const SignupForm = () => {
 
         if (response.data.success) {
           toast.success(response.data.message);
-          localStorage.setItem("u_id" ,response.data.u_id);
+          localStorage.setItem("u_id", response.data.u_id);
           setIsSignupSuccessful(true);
-          localStorage.setItem("isSignupSuccessfull", "true"); 
+          localStorage.setItem("isSignupSuccessfull", "true");
         } else {
           toast.error(response.data.message);
         }
@@ -105,21 +135,24 @@ const SignupForm = () => {
   // ~~~~~~~~~~~~ Section End ~~~~~~~~ //
 
   // ☕︎ CheckVerificationStatus ☕︎ //
-  const checkVerificationStatus = async()=>{
-   try {
-         const userId = localStorage.getItem("u_id");
-         const storedUserId = userId.trim(); 
-          const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/isverify/${storedUserId}`);
-          if(response.data.success){
-            toast.success("Your account is verified!");
-            setIsSignupSuccessful(false);
-            localStorage.removeItem("isSignupSuccessfull");
-            navigate("/home")
-          }
-   } catch (error) { 
-   }
-  }
- // ~~~~~~~~~ Section End ~~~~~~~~~~//
+  const checkVerificationStatus = async () => {
+    try {
+      const userId = localStorage.getItem("u_id");
+      const storedUserId = userId.trim();
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_APP_BASE_URL
+        }/api/v1/auth/isverify/${storedUserId}`
+      );
+      if (response.data.success) {
+        toast.success("Your account is verified!");
+        setIsSignupSuccessful(false);
+        localStorage.removeItem("isSignupSuccessfull");
+        navigate("/home");
+      }
+    } catch (error) {}
+  };
+  // ~~~~~~~~~ Section End ~~~~~~~~~~//
 
   return (
     <>
@@ -129,7 +162,12 @@ const SignupForm = () => {
             src="https://lottie.host/453c0d82-74a8-4d6f-b254-5910adb70e4b/CvY3mDmWFx.lottie"
             loop
             autoplay
-            style={{ height: "200px", width: "200px", margin: "0 auto", marginTop: "-50px" }}
+            style={{
+              height: "200px",
+              width: "200px",
+              margin: "0 auto",
+              marginTop: "-50px",
+            }}
           />
           <h1>
             <img
@@ -152,14 +190,20 @@ const SignupForm = () => {
                 id="fullname"
                 name="fullname"
                 style={{ fontSize: "13px", height: "40px" }}
-                className={`form-control ${formik.touched.fullname && formik.errors.fullname ? "is-invalid" : ""}`}
+                className={`form-control ${
+                  formik.touched.fullname && formik.errors.fullname
+                    ? "is-invalid"
+                    : ""
+                }`}
                 value={formik.values.fullname}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Enter your full name"
               />
               {formik.touched.fullname && formik.errors.fullname && (
-                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                <span
+                  style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}
+                >
                   {formik.errors.fullname}
                 </span>
               )}
@@ -173,14 +217,20 @@ const SignupForm = () => {
                 id="email"
                 style={{ fontSize: "13px", height: "40px" }}
                 name="email"
-                className={`form-control ${formik.touched.email && formik.errors.email ? "is-invalid" : ""}`}
+                className={`form-control ${
+                  formik.touched.email && formik.errors.email
+                    ? "is-invalid"
+                    : ""
+                }`}
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Enter email"
               />
               {formik.touched.email && formik.errors.email && (
-                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                <span
+                  style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}
+                >
                   {formik.errors.email}
                 </span>
               )}
@@ -192,7 +242,11 @@ const SignupForm = () => {
               <input
                 type="password"
                 id="password"
-                className={`form-control ${formik.touched.password && formik.errors.password ? "is-invalid" : ""}`}
+                className={`form-control ${
+                  formik.touched.password && formik.errors.password
+                    ? "is-invalid"
+                    : ""
+                }`}
                 style={{ fontSize: "13px", height: "40px" }}
                 name="password"
                 value={formik.values.password}
@@ -201,7 +255,9 @@ const SignupForm = () => {
                 placeholder="Password"
               />
               {formik.touched.password && formik.errors.password && (
-                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                <span
+                  style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}
+                >
                   {formik.errors.password}
                 </span>
               )}
@@ -214,7 +270,11 @@ const SignupForm = () => {
                 type="file"
                 id="profile-image"
                 name="profile"
-                className={`form-control ${formik.touched.profile && formik.errors.profile ? "is-invalid" : ""}`}
+                className={`form-control ${
+                  formik.touched.profile && formik.errors.profile
+                    ? "is-invalid"
+                    : ""
+                }`}
                 onChange={(event) => {
                   const profile = event.currentTarget.files[0];
                   formik.setFieldValue("profile", profile);
@@ -222,7 +282,9 @@ const SignupForm = () => {
                 accept="image/*"
               />
               {formik.touched.profile && formik.errors.profile && (
-                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                <span
+                  style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}
+                >
                   {formik.errors.profile}
                 </span>
               )}
@@ -238,7 +300,11 @@ const SignupForm = () => {
           </p>
         </div>
       ) : (
-        <EmailVerification timeLeft={timeLeft} fullname={formik.values.fullname} email ={formik.values.email} />
+        <EmailVerification
+          timeLeft={timeLeft}
+          fullname={formik.values.fullname}
+          email={formik.values.email}
+        />
       )}
     </>
   );

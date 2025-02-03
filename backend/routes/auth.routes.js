@@ -1,6 +1,6 @@
 import express from 'express'
 import {body} from 'express-validator'
-import { isVerifiedUser, SignupUser, VerifyUser } from '../controllers/AuthController.js';
+import { deleteUser, isVerifiedUser, SignupUser, VerifyUser } from '../controllers/AuthController.js';
 import upload from '../services/multer.js';
 const AuthRoutes = express.Router();
 
@@ -31,7 +31,10 @@ AuthRoutes.post("/signup", upload.single('profile') , [
 AuthRoutes.get("/verify/:verificationToken" , VerifyUser )
 
 // ~ Verification Route 🚦💨 ~ //
-AuthRoutes.get("/isverify/:u_id" , isVerifiedUser )
+AuthRoutes.get("/isverify/:u_id" , isVerifiedUser)
+
+// ~ Delete User Routes 🚦💨 ~ //
+AuthRoutes.delete("/deleteUser/:id" , deleteUser)
 
 
 export default AuthRoutes;
