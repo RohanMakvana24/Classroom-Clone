@@ -5,6 +5,7 @@ import UserModel from "../models/UserModel.js";
 import sendMail from "../services/emailService/emailServies.js";
 import EmailTemplte from "../templates/emailTemplate.js";
 import {v4 as uuidv4 } from 'uuid'
+import { error } from 'console';
 
 
 export const SignupUser = async (req, res) => {
@@ -53,14 +54,15 @@ export const SignupUser = async (req, res) => {
     return res.status(200).json({
       success : true,
       message : "The User Ragistered Succefully",
-      token : token
+      token : token,
+      user :newUser,
+      u_id : newUser._id
     })
   } catch (error) {
     console.log(error);
     throw HTTP_Response(504, error.message);
   }
 };
-
 
 export const VerifyUser = async (req,res)=>{
   try {
@@ -100,5 +102,37 @@ export const VerifyUser = async (req,res)=>{
       succecc: false,
       message: error.message,
     });
+  }
+}
+
+export const isVerifiedUser = async (req,res)=>{
+  try {
+    const userId = req.params.u_id;
+    if(!userId){
+      return res.status(400).json({
+        success :false,
+        message : "User id is required"
+      })
+    }
+
+    const user = await UserModel.findById(userId);
+    if(user.verified){
+      return res.status(200).json({
+        success : true,
+        message : "User Verified"
+      })
+    }
+    else{
+      return res.status(400).json({
+        success : false,
+        message : "User Not Verified"
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(504).json({
+      succecc :false,
+      message : error.message
+    })
   }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "remixicon/fonts/remixicon.css";
 import "../../assets/css/loginForm.css";
 import { Link } from "react-router-dom";
@@ -7,8 +7,67 @@ import { useFormik } from "formik";
 import SignupSchema from "../../ValidationSchema/Authentication/SignupSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
+import EmailVerification from "./EmailVerification";
+import {useNavigate} from 'react-router-dom'
+
 const SignupForm = () => {
-  // Formik To handle Singup Form
+  const navigate = useNavigate();
+ 
+  // ☕︎ Signup And Verification Hide and Show ☕︎ //
+  const [isSignupSuccessfull, setIsSignupSuccessful] = useState(() => {
+    return localStorage.getItem("isSignupSuccessfull") === "true";
+  });
+  useEffect(() => {
+    localStorage.setItem("isSignupSuccessfull", isSignupSuccessfull);
+  }, [isSignupSuccessfull]);
+
+  useEffect(()=>{
+    let interval;
+    if(isSignupSuccessfull){
+      interval = setInterval(()=>{
+        checkVerificationStatus();
+      },4000)
+    }
+    return ()=>{
+      if(interval)  clearInterval(interval);
+    }
+  },[isSignupSuccessfull])
+
+  // ~~~~~~~~~~~~~~~~~~~~ Section End ~~~~~~~~~~~~~~~~~~~~~~ //
+
+  const [timeLeft, setTimeLeft] = useState(()=>{
+    const savedTime = localStorage.getItem('signupTimer');
+    if(savedTime){
+      const timeDiff = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
+      return Math.max(120 - timeDiff, 0);
+    }
+    return 120;
+  });
+
+  useEffect(() => {
+    if(!isSignupSuccessfull) return;
+
+    if (timeLeft === 120){
+      localStorage.setItem("signupTimer", Date.now().toString());
+    }
+    if (timeLeft === 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        const newTime = prevTime - 1;
+        if (newTime <= 0) {
+          clearInterval(timer);
+          localStorage.removeItem("signupTimer");0
+          console.log("stop")
+        }
+        return newTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer); // Cleanup on unmount
+  }, [timeLeft , isSignupSuccessfull]);
+
+  // ☕︎ Signup Form Submiting Handler ☕︎ //
   const formik = useFormik({
     initialValues: { fullname: "", email: "", password: "", profile: null },
     validationSchema: SignupSchema,
@@ -24,163 +83,164 @@ const SignupForm = () => {
           `${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/signup`,
           formData,
           {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
+            headers: { "Content-Type": "multipart/form-data" },
           }
         );
-        console.log(response);
-      } catch (error) {
-        if (error) {
-          if (error.response?.data?.message) {
-            toast.error(
-              error.response.data.message || "Signup failed! Please try again."
-            );
-          }
+
+        if (response.data.success) {
+          toast.success(response.data.message);
+          localStorage.setItem("u_id" ,response.data.u_id);
+          setIsSignupSuccessful(true);
+          localStorage.setItem("isSignupSuccessfull", "true"); 
         } else {
-          toast.error("Somenthin Went Wrong");
+          toast.error(response.data.message);
         }
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message || "Something went wrong. Try again!"
+        );
       }
     },
   });
+  // ~~~~~~~~~~~~ Section End ~~~~~~~~ //
+
+  // ☕︎ CheckVerificationStatus ☕︎ //
+  const checkVerificationStatus = async()=>{
+   try {
+         const userId = localStorage.getItem("u_id");
+         const storedUserId = userId.trim(); 
+          const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/isverify/${storedUserId}`);
+          if(response.data.success){
+            toast.success("Your account is verified!");
+            setIsSignupSuccessful(false);
+            localStorage.removeItem("isSignupSuccessfull");
+            navigate("/home")
+          }
+   } catch (error) { 
+   }
+  }
+ // ~~~~~~~~~ Section End ~~~~~~~~~~//
 
   return (
-    <div className="container">
-      <DotLottieReact
-        src="https://lottie.host/453c0d82-74a8-4d6f-b254-5910adb70e4b/CvY3mDmWFx.lottie"
-        loop
-        autoplay
-        style={{
-          height: "200px",
-          width: "200px",
-          margin: "0 auto",
-          marginTop: "-50px", // Adjust the negative margin as needed
-        }}
-      />
-      <h1>
-        <img
-          style={{ height: "22px", width: "22px", marginBottom: "5px" }}
-          src="https://img.icons8.com/?size=100&id=asrpF0KlPITb&format=png&color=000000"
-        />
-        Welcome
-        <img
-          style={{ height: "22px", width: "22px", marginBottom: "5px" }}
-          src="https://img.icons8.com/?size=100&id=asrpF0KlPITb&format=png&color=000000"
-        />
-      </h1>
-      <p>Craate your profile to start your journey</p>
-      <form onSubmit={formik.handleSubmit}>
-        {/* Full Name Input */}
-        <div className="form-group">
-          <label htmlFor="full-name">Full Name:</label>
-          <input
-            type="text"
-            id="fullname"
-            name="fullname"
-            style={{ fontSize: "13px", height: "40px" }}
-            className={`form-control ${
-              formik.touched.fullname && formik.errors.fullname
-                ? "is-invalid"
-                : ""
-            }`}
-            value={formik.values.fullname}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter your full name"
+    <>
+      {!isSignupSuccessfull ? (
+        <div className="container">
+          <DotLottieReact
+            src="https://lottie.host/453c0d82-74a8-4d6f-b254-5910adb70e4b/CvY3mDmWFx.lottie"
+            loop
+            autoplay
+            style={{ height: "200px", width: "200px", margin: "0 auto", marginTop: "-50px" }}
           />
-          {formik.touched.fullname && formik.errors.fullname && (
-            <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
-              {" "}
-              {formik.errors.fullname}
-            </span>
-          )}
-        </div>
+          <h1>
+            <img
+              style={{ height: "22px", width: "22px", marginBottom: "5px" }}
+              src="https://img.icons8.com/?size=100&id=asrpF0KlPITb&format=png&color=000000"
+            />
+            Welcome
+            <img
+              style={{ height: "22px", width: "22px", marginBottom: "5px" }}
+              src="https://img.icons8.com/?size=100&id=asrpF0KlPITb&format=png&color=000000"
+            />
+          </h1>
+          <p>Create your profile to start your journey</p>
+          <form onSubmit={formik.handleSubmit}>
+            {/* Full Name Input */}
+            <div className="form-group">
+              <label htmlFor="full-name">Full Name:</label>
+              <input
+                type="text"
+                id="fullname"
+                name="fullname"
+                style={{ fontSize: "13px", height: "40px" }}
+                className={`form-control ${formik.touched.fullname && formik.errors.fullname ? "is-invalid" : ""}`}
+                value={formik.values.fullname}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter your full name"
+              />
+              {formik.touched.fullname && formik.errors.fullname && (
+                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                  {formik.errors.fullname}
+                </span>
+              )}
+            </div>
 
-        {/* E-Mail Input */}
-        <div className="form-group">
-          <label htmlFor="email">E-Mail:</label>
-          <input
-            type="email"
-            id="email"
-            style={{ fontSize: "13px", height: "40px" }}
-            name="email"
-            className={`form-control ${
-              formik.touched.email && formik.errors.email ? "is-invalid" : ""
-            }`}
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter email"
-          />
+            {/* E-Mail Input */}
+            <div className="form-group">
+              <label htmlFor="email">E-Mail:</label>
+              <input
+                type="email"
+                id="email"
+                style={{ fontSize: "13px", height: "40px" }}
+                name="email"
+                className={`form-control ${formik.touched.email && formik.errors.email ? "is-invalid" : ""}`}
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter email"
+              />
+              {formik.touched.email && formik.errors.email && (
+                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                  {formik.errors.email}
+                </span>
+              )}
+            </div>
 
-          {formik.touched.email && formik.errors.email && (
-            <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
-              {" "}
-              {formik.errors.email}
-            </span>
-          )}
-        </div>
+            {/* Password Input */}
+            <div className="form-group">
+              <label htmlFor="password">Password:</label>
+              <input
+                type="password"
+                id="password"
+                className={`form-control ${formik.touched.password && formik.errors.password ? "is-invalid" : ""}`}
+                style={{ fontSize: "13px", height: "40px" }}
+                name="password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Password"
+              />
+              {formik.touched.password && formik.errors.password && (
+                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                  {formik.errors.password}
+                </span>
+              )}
+            </div>
 
-        {/* Password Input */}
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            className={`form-control ${
-              formik.touched.password && formik.errors.password
-                ? "is-invalid"
-                : ""
-            }`}
-            style={{ fontSize: "13px", height: "40px" }}
-            name="password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Password"
-          />
-          {formik.touched.password && formik.errors.password && (
-            <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
-              {" "}
-              {formik.errors.password}
-            </span>
-          )}
+            {/* Profile Image Input */}
+            <div className="form-group">
+              <label htmlFor="profile-image">Profile Image:</label>
+              <input
+                type="file"
+                id="profile-image"
+                name="profile"
+                className={`form-control ${formik.touched.profile && formik.errors.profile ? "is-invalid" : ""}`}
+                onChange={(event) => {
+                  const profile = event.currentTarget.files[0];
+                  formik.setFieldValue("profile", profile);
+                }}
+                accept="image/*"
+              />
+              {formik.touched.profile && formik.errors.profile && (
+                <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
+                  {formik.errors.profile}
+                </span>
+              )}
+            </div>
+            <button type="submit">SIGNUP</button>
+          </form>
+          <p className="mt-3">
+            Already have an account? <Link to="/login">Sign In</Link>
+          </p>
+          <br />
+          <p className="last-policy-description">
+            By signing up, you agree to our terms and conditions.
+          </p>
         </div>
-
-        {/* Profile Image Input */}
-        <div className="form-group">
-          <label htmlFor="profile-image">Profile Image:</label>
-          <input
-            type="file"
-            id="profile-image"
-            name="profile"
-            className={`form-control ${
-              formik.touched.profile && formik.errors.profile
-                ? "is-invalid"
-                : ""
-            }`}
-            onChange={(event) => {
-              const profile = event.currentTarget.files[0];
-              formik.setFieldValue("profile", profile);
-            }}
-            accept="image/*"
-          />
-          {formik.touched.profile && formik.errors.profile && (
-            <span style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}>
-              {formik.errors.profile}
-            </span>
-          )}
-        </div>
-        <button type="submit">SIGNUP</button>
-      </form>
-      <p className="mt-3">
-        Don't have an Account? <Link to="/login">SignIn</Link>
-      </p>
-      <br />
-      <p className="last-policy-description">
-        By signing up, you agree to our last policy terms and conditions.
-      </p>
-    </div>
+      ) : (
+        <EmailVerification timeLeft={timeLeft} fullname={formik.values.fullname} email ={formik.values.email} />
+      )}
+    </>
   );
 };
 

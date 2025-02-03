@@ -1,6 +1,6 @@
 import express from 'express'
 import {body} from 'express-validator'
-import { SignupUser, VerifyUser } from '../controllers/AuthController.js';
+import { isVerifiedUser, SignupUser, VerifyUser } from '../controllers/AuthController.js';
 import upload from '../services/multer.js';
 const AuthRoutes = express.Router();
 
@@ -29,5 +29,9 @@ AuthRoutes.post("/signup", upload.single('profile') , [
 
 // ~ Verification Route 🚦💨 ~ //
 AuthRoutes.get("/verify/:verificationToken" , VerifyUser )
+
+// ~ Verification Route 🚦💨 ~ //
+AuthRoutes.get("/isverify/:u_id" , isVerifiedUser )
+
 
 export default AuthRoutes;
