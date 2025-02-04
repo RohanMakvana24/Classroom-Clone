@@ -60,9 +60,6 @@ const SignupForm = () => {
         if (newTime <= 0) {
           clearInterval(timer);
           localStorage.removeItem("signupTimer");
-          console.log("Stop");
-          // Delete User API
-          // Call the delete API
           const deleteUser = async () => {
             try {
               const response = await axios.delete(
@@ -76,7 +73,7 @@ const SignupForm = () => {
                 toast.success(response.data.message);
                 setIsSignupSuccessful(false);
                 localStorage.removeItem("u_id");
-                console.log("OK DONE BHIA ");
+
               } else {
                 toast.error(response.data.message);
               }
@@ -87,7 +84,6 @@ const SignupForm = () => {
               );
             }
           };
-
           deleteUser();
         }
         return newTime;
@@ -101,7 +97,7 @@ const SignupForm = () => {
   const formik = useFormik({
     initialValues: { fullname: "", email: "", password: "", profile: null },
     validationSchema: SignupSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values , {resetForm}) => {
       try {
         const formData = new FormData();
         formData.append("fullname", values.fullname);
@@ -121,11 +117,15 @@ const SignupForm = () => {
           toast.success(response.data.message);
           localStorage.setItem("u_id", response.data.u_id);
           setIsSignupSuccessful(true);
+          setTimeLeft(120);
+          localStorage.setItem("signupTimer", Date.now().toString());
           localStorage.setItem("isSignupSuccessfull", "true");
+          resetForm();
         } else {
           toast.error(response.data.message);
         }
       } catch (error) {
+        console.log(error)
         toast.error(
           error.response?.data?.message || "Something went wrong. Try again!"
         );
