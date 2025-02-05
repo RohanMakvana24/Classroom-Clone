@@ -9,10 +9,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import EmailVerification from "./EmailVerification";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { login } from "../../features/auth/authSlice";
 const SignupForm = () => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   // ☕︎ Signup And Verification Hide and Show ☕︎ //
   const [isSignupSuccessfull, setIsSignupSuccessful] = useState(() => {
     return localStorage.getItem("isSignupSuccessfull") === "true";
@@ -121,6 +122,11 @@ const SignupForm = () => {
           localStorage.setItem("signupTimer", Date.now().toString());
           localStorage.setItem("isSignupSuccessfull", "true");
           resetForm();
+          const userData = {
+            user : response.data.user,
+            token : response.data.token
+          }
+          dispatch(login(userData))
         } else {
           toast.error(response.data.message);
         }

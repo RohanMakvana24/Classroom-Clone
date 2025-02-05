@@ -12,36 +12,24 @@ import OneClassPage from "./pages/OneClassPage";
 import SettingPage from "./pages/SettingPage";
 import ProfilePage from "./pages/ProfilePage";
 import "./App.css";
+import PrivateRoute from "./private-route/PrivateRoute";
+import CheckIsAuthenticated from "./private-route/CheckisAuthenticated";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<StarterPage />}>
-        {" "}
-      </Route>
-      <Route path="/home" element={<HomePage />}>
-        {" "}
-      </Route>
-      <Route path="/login" element={<LoginForm />}>
-        {" "}
-      </Route>
-      <Route path="/signup" element={<SignupForm />}>
-        {" "}
-      </Route>
-      <Route path="/forgot-password" element={<ForgotPassword />}>
-        {" "}
-      </Route>
-      <Route path="/otp-verification" element={<OTPVerification />}>
-        {" "}
-      </Route>
-      <Route path="/one-class" element={<OneClassPage />}>
-        {" "}
-      </Route>
-      <Route path="/setting" element={<SettingPage />}>
-        {" "}
-      </Route>
-      <Route path="/profile" element={<ProfilePage />}>
-        {" "}
-      </Route>
+      <Route path="/" element={<StarterPage />}></Route>
+      <Route path="/home" element={
+          <PrivateRoute>
+              <HomePage />
+          </PrivateRoute>
+      }></Route>
+      <Route path="/login" element={<CheckIsAuthenticated><LoginForm /> </CheckIsAuthenticated>}></Route>
+      <Route path="/signup" element={<CheckIsAuthenticated><SignupForm /> </CheckIsAuthenticated>}></Route>
+      <Route path="/forgot-password" element={<ForgotPassword />}></Route>
+      <Route path="/otp-verification" element={<OTPVerification />}></Route>
+      <Route path="/one-class" element={<OneClassPage />}></Route>
+      <Route path="/setting" element={<SettingPage />}></Route>
+      <Route path="/profile" element={<ProfilePage />}></Route>
     </Routes>
   );
 }
