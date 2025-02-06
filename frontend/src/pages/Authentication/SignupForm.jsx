@@ -11,13 +11,16 @@ import EmailVerification from "./EmailVerification";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../features/auth/authSlice";
+
 const SignupForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   // ☕︎ Signup And Verification Hide and Show ☕︎ //
   const [isSignupSuccessfull, setIsSignupSuccessful] = useState(() => {
     return localStorage.getItem("isSignupSuccessfull") === "true";
   });
+
   useEffect(() => {
     localStorage.setItem("isSignupSuccessfull", isSignupSuccessfull);
   }, [isSignupSuccessfull]);
@@ -47,7 +50,6 @@ const SignupForm = () => {
 
   useEffect(() => {
     if (!isSignupSuccessfull) return;
-
     if (timeLeft === 120) {
       localStorage.setItem("signupTimer", Date.now().toString());
     }
@@ -61,6 +63,7 @@ const SignupForm = () => {
         if (newTime <= 0) {
           clearInterval(timer);
           localStorage.removeItem("signupTimer");
+
           const deleteUser = async () => {
             try {
               const response = await axios.delete(
@@ -68,13 +71,11 @@ const SignupForm = () => {
                   import.meta.env.VITE_APP_BASE_URL
                 }/api/v1/auth/deleteUser/${userId}`
               );
-              console.log(response);
 
               if (response.data.success) {
                 toast.success(response.data.message);
                 setIsSignupSuccessful(false);
                 localStorage.removeItem("u_id");
-
               } else {
                 toast.error(response.data.message);
               }
@@ -98,7 +99,7 @@ const SignupForm = () => {
   const formik = useFormik({
     initialValues: { fullname: "", email: "", password: "", profile: null },
     validationSchema: SignupSchema,
-    onSubmit: async (values , {resetForm}) => {
+    onSubmit: async (values, { resetForm }) => {
       try {
         const formData = new FormData();
         formData.append("fullname", values.fullname);
@@ -116,49 +117,62 @@ const SignupForm = () => {
 
         if (response.data.success) {
           toast.success(response.data.message);
+
+          // Store user data in localStorage instead of Redux
           localStorage.setItem("u_id", response.data.u_id);
+          localStorage.setItem("user_data", JSON.stringify(response.data.user));
+          localStorage.setItem("token", response.data.token);
+
           setIsSignupSuccessful(true);
           setTimeLeft(120);
           localStorage.setItem("signupTimer", Date.now().toString());
           localStorage.setItem("isSignupSuccessfull", "true");
+
           resetForm();
-          const userData = {
-            user : response.data.user,
-            token : response.data.token
-          }
-          dispatch(login(userData))
         } else {
           toast.error(response.data.message);
         }
       } catch (error) {
-        console.log(error)
         toast.error(
           error.response?.data?.message || "Something went wrong. Try again!"
         );
       }
     },
   });
-  // ~~~~~~~~~~~~ Section End ~~~~~~~~ //
 
-  // ☕︎ CheckVerificationStatus ☕︎ //
+  // ☕︎ Check Verification Status ☕︎ //
   const checkVerificationStatus = async () => {
     try {
       const userId = localStorage.getItem("u_id");
-      const storedUserId = userId.trim();
+      if (!userId) return;
+
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_APP_BASE_URL
-        }/api/v1/auth/isverify/${storedUserId}`
+        `${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/isverify/${userId}`
       );
+
       if (response.data.success) {
         toast.success("Your account is verified!");
-        setIsSignupSuccessful(false);
+
+        // Retrieve stored user data
+        const storedUser = JSON.parse(localStorage.getItem("user_data"));
+        const storedToken = localStorage.getItem("token");
+
+        if (storedUser && storedToken) {
+          // Dispatch Redux action after verification success
+          dispatch(login({ user: storedUser, token: storedToken }));
+        }
+
+        // Cleanup localStorage and navigate
         localStorage.removeItem("isSignupSuccessfull");
+        localStorage.removeItem("user_data");
+        localStorage.removeItem("token");
+        localStorage.removeItem("u_id");
+
+        setIsSignupSuccessful(false);
         navigate("/home");
       }
     } catch (error) {}
   };
-  // ~~~~~~~~~ Section End ~~~~~~~~~~//
 
   return (
     <>
