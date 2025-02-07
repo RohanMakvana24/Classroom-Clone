@@ -1,6 +1,14 @@
 import React from 'react'
-
+import { useDispatch } from 'react-redux'
+import { logout } from '../../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 const Navbar = () => {
+  const navigate = useNavigate();
+  const dispatach = useDispatch();
+  const handleLogout = ()=>{
+    dispatach(logout());
+    localStorage.removeItem('auth');
+  }
   return (
     <> <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div className="container-fluid">
@@ -73,7 +81,7 @@ const Navbar = () => {
               </a>
             </li>
             <li>
-              <a className="dropdown-item" href="#">
+              <a className="dropdown-item" onClick={handleLogout}>
                 Logout
               </a>
             </li>

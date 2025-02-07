@@ -1,7 +1,8 @@
 import React from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import 'remixicon/fonts/remixicon.css'
-const EmailVerification = ({timeLeft , fullname , email}) => {
+import 'remixicon/fonts/remixicon.css';
+
+const EmailVerification = ({ timeLeft}) => {
   const styles = {
     body1: {
       backgroundColor: "#f0f4f8",
@@ -18,9 +19,20 @@ const EmailVerification = ({timeLeft , fullname , email}) => {
       textAlign: "center",
       boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
     },
-    image: {
-      width: "50px",
+    header: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
       marginBottom: "20px",
+      fontSize: "30px",
+      color: "#333",
+      fontWeight: "600",
+      letterSpacing: "1px",
+    },
+    icon: {
+      fontSize: "36px",
+      color: "#4CAF50",
+      marginRight: "10px",
     },
     heading: {
       fontSize: "24px",
@@ -49,11 +61,18 @@ const EmailVerification = ({timeLeft , fullname , email}) => {
     const secs = seconds % 60;
     return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
+  const email =  localStorage.getItem('email')
+  const fullname = localStorage.getItem('fullname')
   return (
     <div style={styles.body1}>
       <div style={styles.container1}>
-        <h5> <i class="ri-school-fill"></i> <span> Classroom </span> </h5>     
-        <h1 style={styles.heading}>Email Verification </h1>
+        {/* Header with Icon and Text */}
+        <div style={styles.header}>
+          <i className="ri-mail-send-line" style={styles.icon}></i>
+          <span>Email Verification</span>
+        </div>
+        
+        <h1 style={styles.heading}>Almost there!</h1>
         <h2 style={styles.subHeading}>
           Hey {fullname}, <br /> Just one more step... !!!
         </h2>
@@ -61,16 +80,16 @@ const EmailVerification = ({timeLeft , fullname , email}) => {
           src="https://lottie.host/4e51551d-b5f0-449e-98ee-f8272020b85d/fhPyLKMfOV.lottie"
           loop
           autoplay
-          style={{ width: "300px", height: "300px", margin:"auto" }}
-
+          style={{ width: "300px", height: "300px", margin: "auto" }}
         />
         <p style={styles.paragraph}>
           To activate your account, click the link in the email we've sent to:
         </p>
         <p style={styles.email}>{email}</p>
-        <p style={styles.paragraph}>Active your account within <span style={{ color : "red"}}>{formatTime(timeLeft)}</span></p>
- 
-       
+        <p style={styles.paragraph}>
+          Activate your account within{" "}
+          <span style={{ color: "red" }}>{formatTime(timeLeft)}</span>
+        </p>
       </div>
     </div>
   );

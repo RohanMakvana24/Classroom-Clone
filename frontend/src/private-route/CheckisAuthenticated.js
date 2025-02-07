@@ -13,9 +13,9 @@ const CheckIsAuthenticated = ({ children }) => {
             if (location.pathname === "/login" || location.pathname === "/signup") {
                 navigate("/home");
             }
+            navigate("/home");
         }
     }, [isAuthenticated, navigate, location.pathname]);
-
     return children;
 };
 

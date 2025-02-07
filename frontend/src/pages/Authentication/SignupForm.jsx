@@ -11,9 +11,9 @@ import EmailVerification from "./EmailVerification";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../features/auth/authSlice";
-
 const SignupForm = () => {
   const navigate = useNavigate();
+  const [signupButtonLoading , setsignupButtonLoading] = useState(false)
   const dispatch = useDispatch();
 
   // ☕︎ Signup And Verification Hide and Show ☕︎ //
@@ -96,11 +96,15 @@ const SignupForm = () => {
   }, [timeLeft, isSignupSuccessfull]);
 
   // ☕︎ Signup Form Submiting Handler ☕︎ //
+
   const formik = useFormik({
     initialValues: { fullname: "", email: "", password: "", profile: null },
     validationSchema: SignupSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
+        setsignupButtonLoading(true);
+        localStorage.setItem('fullname' , values.fullname)
+        localStorage.setItem('email' ,values.email)
         const formData = new FormData();
         formData.append("fullname", values.fullname);
         formData.append("email", values.email);
@@ -117,7 +121,7 @@ const SignupForm = () => {
 
         if (response.data.success) {
           toast.success(response.data.message);
-
+          setsignupButtonLoading(false);
           // Store user data in localStorage instead of Redux
           localStorage.setItem("u_id", response.data.u_id);
           localStorage.setItem("user_data", JSON.stringify(response.data.user));
@@ -133,6 +137,8 @@ const SignupForm = () => {
           toast.error(response.data.message);
         }
       } catch (error) {
+        setsignupButtonLoading(false);
+
         toast.error(
           error.response?.data?.message || "Something went wrong. Try again!"
         );
@@ -160,15 +166,15 @@ const SignupForm = () => {
         if (storedUser && storedToken) {
           // Dispatch Redux action after verification success
           dispatch(login({ user: storedUser, token: storedToken }));
+          // Cleanup localStorage and navigate
+          localStorage.removeItem("isSignupSuccessfull");
+          localStorage.removeItem("signupTimer");
+          localStorage.removeItem("user_data");
+          localStorage.removeItem("token");
+          localStorage.removeItem("u_id");
+          localStorage.removeItem('email')
+          localStorage.removeItem('fullname')
         }
-
-        // Cleanup localStorage and navigate
-        localStorage.removeItem("isSignupSuccessfull");
-        localStorage.removeItem("user_data");
-        localStorage.removeItem("token");
-        localStorage.removeItem("u_id");
-
-        setIsSignupSuccessful(false);
         navigate("/home");
       }
     } catch (error) {}
@@ -309,7 +315,7 @@ const SignupForm = () => {
                 </span>
               )}
             </div>
-            <button type="submit">SIGNUP</button>
+            <button type="submit"> {signupButtonLoading ? <span className="spinner-border spinner-border-sm"></span> : "SIGNUP"}</button>
           </form>
           <p className="mt-3">
             Already have an account? <Link to="/login">Sign In</Link>
@@ -322,8 +328,6 @@ const SignupForm = () => {
       ) : (
         <EmailVerification
           timeLeft={timeLeft}
-          fullname={formik.values.fullname}
-          email={formik.values.email}
         />
       )}
     </>

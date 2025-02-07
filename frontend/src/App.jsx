@@ -25,8 +25,8 @@ function App() {
       }></Route>
       <Route path="/login" element={<CheckIsAuthenticated><LoginForm /> </CheckIsAuthenticated>}></Route>
       <Route path="/signup" element={<CheckIsAuthenticated><SignupForm /> </CheckIsAuthenticated>}></Route>
-      <Route path="/forgot-password" element={<ForgotPassword />}></Route>
-      <Route path="/otp-verification" element={<OTPVerification />}></Route>
+      <Route path="/forgot-password" element={<CheckIsAuthenticated><ForgotPassword /> </CheckIsAuthenticated>}></Route>
+      <Route path="/otp-verification" element={<CheckIsAuthenticated><OTPVerification /></CheckIsAuthenticated>}></Route>
       <Route path="/one-class" element={<OneClassPage />}></Route>
       <Route path="/setting" element={<SettingPage />}></Route>
       <Route path="/profile" element={<ProfilePage />}></Route>
