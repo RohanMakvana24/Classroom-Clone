@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../features/auth/authSlice";
 const SignupForm = () => {
   const navigate = useNavigate();
-  const [signupButtonLoading , setsignupButtonLoading] = useState(false)
+  const [signupButtonLoading, setsignupButtonLoading] = useState(false);
   const dispatch = useDispatch();
 
   // ☕︎ Signup And Verification Hide and Show ☕︎ //
@@ -103,8 +103,8 @@ const SignupForm = () => {
     onSubmit: async (values, { resetForm }) => {
       try {
         setsignupButtonLoading(true);
-        localStorage.setItem('fullname' , values.fullname)
-        localStorage.setItem('email' ,values.email)
+        localStorage.setItem("fullname", values.fullname);
+        localStorage.setItem("email", values.email);
         const formData = new FormData();
         formData.append("fullname", values.fullname);
         formData.append("email", values.email);
@@ -172,8 +172,8 @@ const SignupForm = () => {
           localStorage.removeItem("user_data");
           localStorage.removeItem("token");
           localStorage.removeItem("u_id");
-          localStorage.removeItem('email')
-          localStorage.removeItem('fullname')
+          localStorage.removeItem("email");
+          localStorage.removeItem("fullname");
         }
         navigate("/home");
       }
@@ -315,7 +315,14 @@ const SignupForm = () => {
                 </span>
               )}
             </div>
-            <button type="submit"> {signupButtonLoading ? <span className="spinner-border spinner-border-sm"></span> : "SIGNUP"}</button>
+            <button type="submit">
+              {" "}
+              {signupButtonLoading ? (
+                <span className="spinner-border spinner-border-sm"></span>
+              ) : (
+                "SIGNUP"
+              )}
+            </button>
           </form>
           <p className="mt-3">
             Already have an account? <Link to="/login">Sign In</Link>
@@ -326,9 +333,7 @@ const SignupForm = () => {
           </p>
         </div>
       ) : (
-        <EmailVerification
-          timeLeft={timeLeft}
-        />
+        <EmailVerification timeLeft={timeLeft} />
       )}
     </>
   );
