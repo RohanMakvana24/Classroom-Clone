@@ -91,11 +91,14 @@ export const VerifyUser = async (req,res)=>{
       verificationToken : ''
     })
 
-    res.status(200).json({
-      success: true,
-      message:
-        "Email Verification Successful: Your email has been successfully verified. You can now access and enjoy our services. Thank you for confirming your email!",
-    });
+    var clientBaseURL = process.env.CLIENT_BASE_URL
+
+    res.render('emailVerified',{clientBaseURL : clientBaseURL});
+    // res.status(200).json({
+    //   success: true,
+    //   message:
+    //     "Email Verification Successful: Your email has been successfully verified. You can now access and enjoy our services. Thank you for confirming your email!",
+    // });
 
   } catch (error) {
     res.status(504).json({

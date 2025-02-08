@@ -12,19 +12,21 @@ const uploadToCloudinary = async (filepath, originalName) => {
       folder: "uploads",
       resource_type: "auto",
     });
-    fs.unlinkSync(filepath, (err) => {
-      if (err) {
-        console.log(error);
+       // Attempt to delete the file after successful upload
+       try {
+        fs.unlinkSync(filepath); // Synchronously delete the file
+      } catch (deleteError) {
+        console.error("Error deleting file:", deleteError);
       }
-    });
     return result;
   } catch (error) {
-    fs.unlinkSync(filepath, (err) => {
-      if (err) {
-        console.log(error);
+      // Attempt to delete the file after successful upload
+      try {
+        fs.unlinkSync(filepath); // Synchronously delete the file
+      } catch (deleteError) {
+        console.error("Error deleting file:", deleteError);
       }
-    });
-    throw error;
+     console.log(error)
   }
 };
 

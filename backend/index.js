@@ -37,6 +37,9 @@ server.use((err,req,res,next)=>{
 server.use(HandleGlobalError);
 
 
+// ✌︎︎ View Engine Setup ✌︎︎ // 
+server.set('view engine' , 'ejs');
+
 // ✌︎︎ Server Listem ✌︎︎ // 
 server.listen(port ,()=>{
     console.log(chalk.magenta(` ★☆ Server Listing On  ~ PORT:${port} ~  ★☆ `))
