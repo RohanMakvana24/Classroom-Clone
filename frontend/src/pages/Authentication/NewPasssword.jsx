@@ -1,34 +1,49 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useFormik } from "formik";
-import ForgotPasswordSchma from "../../ValidationSchema/Authentication/ForgotPasswordSchema";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const ForgotPassword = () => {
+import NewPasswordSchema from "../../ValidationSchema/Authentication/NewPasswordSchema";
 
+
+const NewPassword = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const params = new URLSearchParams(location.search);
+  const email =  params.get("email");
+
+
   //handle Form Using The Formik
   const formik = useFormik({
-    initialValues: { email: "" },
-    validationSchema: ForgotPasswordSchma,
+    initialValues: { password: "", confirmPassword: "" },
+    validationSchema: NewPasswordSchema,
     onSubmit: async (values) => {
       try {
+        const newValues = {
+            email : email,
+            password : values.password,
+            confirmPassword : values.confirmPassword
+        }
         const response = await axios.post(
-          `${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/forgot-password`,values
+          `${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/reset-password`,
+          newValues
         );
 
         if (response.data.success) {
           toast.success(response.data.message);
-          navigate(`/otp-verification?email=${response.data.email}`);
+          navigate("/login")
         } else {
           toast.error(response.data.message);
         }
       } catch (error) {
+        console.log(error)
         toast.error(error.response?.data?.message);
       }
     },
   });
+
   return (
     <div
       className="d-flex justify-content-center align-items-center vh-90"
@@ -48,27 +63,19 @@ const ForgotPassword = () => {
       >
         <div className="text-center mb-4">
           <div
-            className="rounded-circle bg-danger d-flex justify-content-center align-items-center mx-auto mb-3"
+            className="rounded-circle bg-dark d-flex justify-content-center align-items-center mx-auto mb-3"
             style={{
               width: "60px",
               height: "60px",
             }}
           >
             <i
-              className="ri-lock-password-fill"
+              className="fa fa-key"
+              aria-hidden="true"
               style={{ fontSize: "1.5rem", color: "white" }}
             ></i>
           </div>
-          <h3 className="fw-bold">Forgot Password?</h3>
-          <p
-            className="text-muted small"
-            style={{
-              marginLeft: "8px",
-            }}
-          >
-            Enter your registered email address below to receive password reset
-            instructions.
-          </p>
+          <h3 className="fw-bold">New Password</h3>
         </div>
         <form
           onSubmit={formik.handleSubmit}
@@ -80,17 +87,17 @@ const ForgotPassword = () => {
           }}
         >
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">
-              Email Address
+            <label htmlFor="password" className="form-label">
+              Password
             </label>
             <input
-              type="email"
+              type="password"
               className={`form-control ${
-                formik.touched.email && formik.errors.email ? "is-invalid" : ""
+                formik.touched.password && formik.errors.password ? "is-invalid" : ""
               }`}
-              id="email"
-              placeholder="e.g. john@example.com"
-              value={formik.values.email}
+              id="password"
+              placeholder="Enter your new password"
+              value={formik.values.password}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               style={{
@@ -98,17 +105,48 @@ const ForgotPassword = () => {
                 padding: "10px", // Padding added inside the input field
               }}
             />
-            {formik.touched.email && formik.errors.email && (
+            {formik.touched.password && formik.errors.password && (
               <div
                 style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}
               >
-                {formik.errors.email}
+                {formik.errors.password}
               </div>
             )}
           </div>
+
+          <div className="mb-3">
+            <label htmlFor="confirmPassword" className="form-label">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              className={`form-control ${
+                formik.touched.confirmPassword && formik.errors.confirmPassword
+                  ? "is-invalid"
+                  : ""
+              }`}
+              id="confirmPassword"
+              placeholder="Confirm your new password"
+              value={formik.values.confirmPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              style={{
+                borderRadius: "4px",
+                padding: "10px", // Padding added inside the input field
+              }}
+            />
+            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+              <div
+                style={{ color: "red", fontSize: "13px", marginLeft: "2px" }}
+              >
+                {formik.errors.confirmPassword}
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
-            className="btn btn-danger w-100 py-2"
+            className="btn btn-dark w-100 py-2"
             style={{
               borderRadius: "10px",
               transition: "0.3s",
@@ -132,4 +170,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default NewPassword;

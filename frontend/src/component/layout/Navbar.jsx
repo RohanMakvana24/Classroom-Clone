@@ -1,14 +1,21 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatach = useDispatch();
   const handleLogout = ()=>{
     dispatach(logout());
     localStorage.removeItem('auth');
+    toast.success("logout Successfull")
   }
+
+  const user = useSelector((state)=>state.auth.user);
+
+  
   return (
     <> <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div className="container-fluid">
@@ -70,7 +77,7 @@ const Navbar = () => {
               alt="User profile picture"
               className="rounded-circle"
               height="32"
-              src="https://storage.googleapis.com/a1aa/image/YrK2E8BphRahKhNdBgghPjkOHBPTd1uVOi3T9YU9iZACjOCF.jpg"
+              src={`${user.profile.url ? user.profile.url : "https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_w.jpeg" }`}
               width="32"
             />
           </button>

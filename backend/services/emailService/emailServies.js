@@ -1,8 +1,7 @@
 import nodemailer from "nodemailer";
 import Validator from 'mailgun-validate'; 
-const validator = new Validator('mail-gun-pub-key');
 
-export const sendMail = async (toEmail, subject, htmlContent, res) => {
+export const sendMail = async (toEmail, subject, htmlContent) => {
   try {
     let transporter = nodemailer.createTransport({
       host: "smtp-relay.brevo.com",

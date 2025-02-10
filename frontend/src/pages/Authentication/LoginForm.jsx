@@ -1,12 +1,18 @@
 import React from "react";
-import { Link, useFetcher } from "react-router-dom";
+import { Link, useFetcher, useNavigate } from "react-router-dom";
 import "../../assets/css/loginForm.css";
 import "remixicon/fonts/remixicon.css";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useFormik } from "formik";
 import LoginSchema from "../../ValidationSchema/Authentication/LoginSchema";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { login } from "../../features/auth/authSlice";
+import {useGoogleLogin} from '@react-oauth/google'
 const LoginForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   //Formik for submiting form
   const formik = useFormik({
     initialValues: { email: "", password: "" },
@@ -16,13 +22,50 @@ const LoginForm = () => {
         const response = await axios.post(
           `${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/login`,
           values
-        );
-        console.log(response);
+        );   
+        if(response.data.success){
+             toast.success(response.data.message);
+             dispatch(login({ user : response.data.data.user , token : response.data.data.token}));
+             navigate("/home");
+        }else{
+           toast.error(response.data.message)
+        }
       } catch (error) {
-        console.log(error);
+        if(error){
+          if(error.response?.data?.message){
+            toast.error(error.response.data.message)
+          }else{
+            toast.error("Somenting Went Wrong in Login API..")
+          }
+        }else{
+          toast.error("Somenting Went Wrong in Login API..")
+        }
       }
     },
   });
+
+  // Handle Google Login 
+  const googleResponse = async(authResult)=>{
+    try {
+       if(authResult['code']){
+         const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/google-login?code=${authResult['code']}}`)
+         if(response.data.success){
+             toast.success(response.data.message)
+             dispatch(login({ user : response.data.user , token : response.data.token}));
+             navigate("/home")
+         }else{
+           toast.error(response.data.message)
+         }
+       }      
+    } catch (error) {
+      toast.error(error.response?.data?.message)
+    }
+  }
+  const handleGoogleLogin = useGoogleLogin({
+        onSuccess : googleResponse,
+        onError : googleResponse,
+        flow : 'auth-code'
+  })
 
   return (
     <div className="container">
@@ -90,9 +133,9 @@ const LoginForm = () => {
         </Link>
       </form>
       <p>OR</p>
-      <Link to="" className="google-btn googleHover">
+      <button onClick={handleGoogleLogin} className="google-btn googleHover">
         <i className="ri-google-fill"></i> Sign-in with Google
-      </Link>
+      </button>
 
       <p className="mt-3">
         Don't have an Account? <Link to="/signup">SignUp</Link>

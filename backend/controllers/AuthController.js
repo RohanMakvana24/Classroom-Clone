@@ -6,6 +6,10 @@ import sendMail from "../services/emailService/emailServies.js";
 import EmailTemplte from "../templates/emailTemplate.js";
 import { v4 as uuidv4 } from "uuid";
 import { mongoose } from "mongoose";
+import OTPTemplate from "../templates/otpTemplate.js";
+import bcrypt from "bcryptjs";
+import { oauth2Client } from "./../config/googleConfig.js";
+import axios from "axios";
 
 // ⬟ Signup User Controller  ⬟ //
 export const SignupUser = async (req, res) => {
@@ -234,6 +238,250 @@ export const LoginUser = async (req, res) => {
     console.log(error);
     res.status(504).json({
       success: false,
+      message: error.message,
+    });
+  }
+};
+// ~~~~~~~~~~~~~~~~~~ ❖ Login User Section End ❖ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+
+// ⬟ Forgot Password Controller  ⬟ //
+export const ForgotPassword = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: errors.array(),
+      });
+    }
+
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Email is incorrect",
+      });
+    }
+
+    function generateOTP() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    const otp = generateOTP();
+
+    // ~ store otp ~ //
+    await UserModel.findByIdAndUpdate(user._id, {
+      otp: otp,
+    });
+
+    // ~ Sending Email ~ //
+    const htmlContent = OTPTemplate(email, otp, user.fullname);
+    const subject = "Forgot Password Verification";
+    sendMail(email, subject, htmlContent);
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent to your email succefully",
+      email: email,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(504).json({
+      sucess: false,
+      message: error.message,
+    });
+  }
+};
+// ~~~~~~~~~~~~~~~~~~ ❖ Forgot Password Section End ❖ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+
+// ⬟ OTP Verification Controller  ⬟ //
+export const OTP_Verification = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    if (!otp) {
+      return res.status(400).json({
+        sucess: false,
+        message: "OTP is required",
+      });
+    }
+
+    if (otp.toString().length !== 6) {
+      return res.status(400).json({
+        sucess: false,
+        message: "OTP length must be at least 6 digit",
+      });
+    }
+
+    const user = await UserModel.findOne({ otp: otp });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP is invalid",
+      });
+    }
+
+    if (user) {
+      await UserModel.findByIdAndUpdate(user._id, {
+        otp: "",
+      });
+      return res.status(200).json({
+        success: true,
+        message: "OTP Verification Done",
+        email: user.email,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(504).json({
+      sucess: false,
+      message: error.message,
+    });
+  }
+};
+// ~~~~~~~~~~~~~~~~~~ ❖ OTP Verification Section End ❖ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+
+// ⬟ Reset Password Controller  ⬟ //
+export const ResetPassword = async (req, res) => {
+  try {
+    const { password, email } = req.body;
+    // ~~ Validation ~~
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+    const errros = validationResult(req);
+    if (!errros.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: errros.array(),
+      });
+    }
+
+    // ~~ Check Email ~~
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Sorrry Somenthing Went Wrong...",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const isUpdated = await UserModel.findByIdAndUpdate(user._id, {
+      password: hashedPassword,
+    });
+
+    if (isUpdated) {
+      return res.status(200).json({
+        success: true,
+        message: "Password reset succefully",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(504).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+// ~~~~~~~~~~~~~~~~~~ ❖ Reset Password Section End ❖ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+
+export const ResendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Email is incorrect",
+      });
+    }
+
+    function generateOTP() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    const otp = generateOTP();
+
+    // ~ Update otp ~ //
+    await UserModel.findByIdAndUpdate(user._id, {
+      otp: otp,
+    });
+    // ~ Sending Email ~ //
+    const htmlContent = OTPTemplate(email, otp, user.fullname);
+    const subject = "Forgot Password Verification";
+    sendMail(email, subject, htmlContent);
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP resent to your email succefully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(504).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const GoogleLogin = async (req, res) => {
+  try {
+    const { code } = req.query;
+    const googleRes = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(googleRes.tokens);
+
+    const userRes = await axios.get(
+      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
+    );
+    const { email, name, picture } = userRes.data;
+
+    let user = await UserModel.findOne({ email: email });
+    if (user && user.isGoogleLogin === false) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists. Please log in instead.",
+      });
+    }
+
+    if (!user) {
+      user = await UserModel.create({
+        fullname: name,
+        isGoogleLogin: true,
+        email: email,
+        profile: {
+          url: picture,
+          public_id: "",
+        },
+      });
+
+      const token = user.generateAuthToken();
+      return res.status(200).json({
+        success: true,
+        message: "User Login Successfull",
+        user: user,
+        token: token,
+      });
+    }
+    if (user.isGoogleLogin) {
+      const token = user.generateAuthToken();
+      return res.status(200).json({
+        success: true,
+        message: "User Login Successfull",
+        user: user,
+        token: token,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(504).json({
+      sucess: false,
       message: error.message,
     });
   }

@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken'
 const profileSchema = new mongoose.Schema({
   url: {
     type: String,
-    required: [true, "The Profile Url is required"],
   },
   public_id: {
     type: String,
@@ -35,7 +34,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "The Password is required"],
       minlength: [8, "The Password length must be at least 8 characters"],
       validate: {
         validator: function (v) {
@@ -59,6 +57,15 @@ const userSchema = new mongoose.Schema(
     },
     verificationToken: {
       type: String,
+    },
+    isGoogleLogin :{
+      type: Boolean,
+      enum: [true, false],
+      default: false,
+    },
+    otp : {
+      type : Number,
+      minlength : [6 , "OTP must be at least 6 digit"]
     },
     profile: profileSchema,
   },
