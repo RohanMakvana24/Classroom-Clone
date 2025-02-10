@@ -39,9 +39,9 @@ function App() {
       <Route path="/forgot-password" element={<CheckIsAuthenticated><ForgotPassword /> </CheckIsAuthenticated>}></Route>
       <Route path="/otp-verification" element={<CheckIsAuthenticated><OTPVerification /></CheckIsAuthenticated>}></Route>
       <Route path="/new-password" element={<CheckIsAuthenticated><NewPassword /></CheckIsAuthenticated>}></Route>
-      <Route path="/one-class" element={<OneClassPage />}></Route>
-      <Route path="/setting" element={<SettingPage />}></Route>
-      <Route path="/profile" element={<ProfilePage />}></Route>
+      <Route path="/one-class" element={   <PrivateRoute> <OneClassPage /> </PrivateRoute>}></Route>
+      <Route path="/setting" element={  <PrivateRoute> <SettingPage /> </PrivateRoute>}></Route>
+      <Route path="/profile" element={ <PrivateRoute> <ProfilePage /> </PrivateRoute>}></Route>
     </Routes>
   );
 }

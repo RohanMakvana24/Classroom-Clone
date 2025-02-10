@@ -22,7 +22,7 @@ const Sidebar = () => {
     <div className="offcanvas-body">
       <ul className="nav flex-column">
         <li className="nav-item">
-          <Link className="nav-link active" to="/home">
+          <Link  to="/home" className="nav-link active" >
             <i className="fas fa-home me-2" /> Home
           </Link>
         </li>

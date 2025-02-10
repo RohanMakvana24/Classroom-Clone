@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import "../assets/css/homePage.css";
 
 import { Link } from "react-router-dom";
@@ -6,8 +6,6 @@ import Navbar from "../component/layout/Navbar";
 import Sidebar from "../component/layout/Sidebar";
 import SidebarDesk from "../component/layout/SidebarDesk";
 const ProfilePage = () => {
- 
-
   const settingStyle = {
     container1: {
       fontFamily: "Arial, sans-serif",
@@ -43,6 +41,14 @@ const ProfilePage = () => {
     },
   };
 
+  const fileInputRef = useRef(null);
+  const handleButtonclick = () => {
+    fileInputRef.current.click();
+  };
+  const handleFileChange = async(event) => {
+    const file = event.target.files[0];
+    
+  };
   return (
     <>
       <div className="mainOP">
@@ -69,21 +75,32 @@ const ProfilePage = () => {
                       }}
                     >
                       <div style={settingStyle.profilePicture}>R</div>
-                      <a href="#" style={settingStyle.link}>
+                      <a
+                        onClick={handleButtonclick}
+                        href="#"
+                        style={settingStyle.link}
+                      >
                         Change
                       </a>
+                      <input
+                        type="file"
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                        ref={fileInputRef}
+                      />
                     </div>
                     <p>
                       <strong>Account settings</strong>
                       <br />
                       Change your password and security options, and access
-                      other Google services. <a href="#">Manage</a>
+                      other Google services.{" "}
+                      <Link to="/setting">account settings </Link>
                     </p>
                     <p>
                       <strong>Change name</strong>
                       <br />
                       To change your name, go to your{" "}
-                      <a href="#">account settings</a>.
+                      <Link to="/setting">account settings</Link>.
                     </p>
                   </div>
                 </div>

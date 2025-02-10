@@ -203,6 +203,12 @@ export const LoginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await UserModel.findOne({ email: email });
+    if(user.isGoogleLogin){
+      return res.status(400).json({
+        success: false,
+        message: "Already Login using the google login option...",
+      });
+    }
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -258,6 +264,12 @@ export const ForgotPassword = async (req, res) => {
     const { email } = req.body;
 
     const user = await UserModel.findOne({ email: email });
+    if(user.isGoogleLogin == true ){
+      return res.status(400).json({
+        success: false,
+        message: "Already Login using the google login option...",
+      });
+    }
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -486,3 +498,12 @@ export const GoogleLogin = async (req, res) => {
     });
   }
 };
+
+export const PrivateAuth = async (req,res)=>{
+  const user = req.user;
+  return res.status(200).json({
+    success : true,
+    message : "Authentication Succefull",
+    isValid : true
+  })
+}

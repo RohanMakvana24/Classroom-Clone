@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 
 const SidebarDesk = () => {
   return (
@@ -6,9 +7,9 @@ const SidebarDesk = () => {
       <nav className="col-lg-2 d-none d-lg-block sidebar bg-light">
         <ul className="nav flex-column">
           <li className="nav-item">
-            <a className="nav-link active" href="#">
+            <Link className="nav-link active" to="/home">
               <i className="fas fa-home me-2" /> Home
-            </a>
+            </Link>
           </li>
           <li className="nav-item">
             <a className="nav-link" href="#">

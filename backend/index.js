@@ -7,6 +7,7 @@ import AuthRoutes from "./routes/auth.routes.js";
 import HTTP_Response from "./utils/HttpResponse.js";
 import cloudinary from "./config/cloudinaryConfig.js";
 import cors from 'cors'
+import userRoutes from "./routes/user.routes.js";
 
 // ✌︎︎ Dotenv Configuration ✌︎︎ // 
 configDotenv.config({ path : "./config/.env"})
@@ -30,6 +31,7 @@ server.use(express.json())
 server.use(cors(corsOptions))
 // ✌︎︎ Routes ✌︎︎ // 
 server.use("/api/v1/auth" , AuthRoutes)
+server.use("/api/v1/user" , userRoutes)
 server.use((err,req,res,next)=>{
     const erroresponse = HTTP_Response(500 , err.message || "Somenthing Went Wrong");
     res.status(erroresponse.status).json({ success : false, message : erroresponse.message})

@@ -1,6 +1,5 @@
 import React from "react";
 import "../assets/css/homePage.css";
-
 import { Link } from "react-router-dom";
 import Navbar from "../component/layout/Navbar";
 import Sidebar from "../component/layout/Sidebar";
@@ -72,7 +71,7 @@ const SettingPage = () => {
   const settingStyle = {
     container1: {
       fontFamily: "Arial, sans-serif",
-    
+
       padding: "20px",
     },
     card1: {
@@ -121,33 +120,6 @@ const SettingPage = () => {
             <main className="col-lg-10 ms-auto px-6">
               <div className="container-fluid mt-4">
                 <div style={settingStyle.container1}>
-                  <div style={settingStyle.card1}>
-                    <h2>Profile</h2>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "15px",
-                      }}
-                    >
-                      <div style={settingStyle.profilePicture}>R</div>
-                      <a href="#" style={settingStyle.link}>
-                        Change
-                      </a>
-                    </div>
-                    <p>
-                      <strong>Account settings</strong>
-                      <br />
-                      Change your password and security options, and access
-                      other Google services. <a href="#">Manage</a>
-                    </p>
-                    <p>
-                      <strong>Change name</strong>
-                      <br />
-                      To change your name, go to your{" "}
-                      <a href="#">account settings</a>.
-                    </p>
-                  </div>
 
                   <div style={settingStyle.card1}>
                     <h2>Notifications</h2>

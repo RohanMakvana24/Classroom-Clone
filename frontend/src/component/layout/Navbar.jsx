@@ -1,18 +1,30 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../../features/auth/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatach = useDispatch();
-  const handleLogout = ()=>{
-    dispatach(logout());
-    localStorage.removeItem('auth');
-    toast.success("logout Successfull")
+  const token = useSelector((state)=>state.auth.token)
+  const handleLogout = async()=>{
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/v1/auth/private-auth`,{
+        headers : {
+          Authorization : `Bearer ${token}`
+        }
+      });
+      if(response.data.isValid && response.data.success ){
+        dispatach(logout());
+        localStorage.removeItem('auth');
+        toast.success("logout Successfull")
+      }
+    } catch (error) {
+      toast.error(error.response.data.message)
+    }
   }
-
   const user = useSelector((state)=>state.auth.user);
 
   
@@ -83,9 +95,9 @@ const Navbar = () => {
           </button>
           <ul className="dropdown-menu dropdown-menu-end">
             <li>
-              <a className="dropdown-item" href="#">
+              <Link className="dropdown-item" to="/profile">
                 Profile
-              </a>
+              </Link>
             </li>
             <li>
               <a className="dropdown-item" onClick={handleLogout}>

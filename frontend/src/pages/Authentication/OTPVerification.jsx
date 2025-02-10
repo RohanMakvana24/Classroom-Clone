@@ -76,7 +76,7 @@ const location = useLocation();
       setCanResend(false);
       localStorage.setItem("otpExpireTime", Date.now() + 120 * 1000);
     } catch (error) {
-      toast.error("Failed         resend OTP. Try again later.");
+      toast.error("Failed  resend OTP. Try again later.");
     }
   };
 
@@ -86,7 +86,7 @@ const location = useLocation();
         <div className="text-center mb-4">
           <DotLottieReact src="https://lottie.host/136e0148-c03f-4508-8b5f-b6f20150f88e/mHOElaCxDs.lottie" loop autoplay className="img-fluid mb-3" />
           <h4 className="fw-bold">Verification</h4>
-          <p className="text-muted">You will get an OTP via SMS</p>
+          <p className="text-muted">You will get an OTP via Email</p>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="otp-container mb-4">

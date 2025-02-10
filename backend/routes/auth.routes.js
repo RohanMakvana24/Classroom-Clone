@@ -7,12 +7,14 @@ import {
   isVerifiedUser,
   LoginUser,
   OTP_Verification,
+  PrivateAuth,
   ResendOtp,
   ResetPassword,
   SignupUser,
   VerifyUser,
 } from "../controllers/AuthController.js";
 import upload from "../services/multer.js";
+import isAuthenticated from "../middleware/auth.js";
 const AuthRoutes = express.Router();
 
 // ~ Signup Route 🚦💨 ~ //
@@ -108,5 +110,9 @@ AuthRoutes.post("/resend-otp" , ResendOtp)
 
 // ~ Google Login  Routes 🚦💨 ~ //
 AuthRoutes.get("/google-login", GoogleLogin)
+
+// ~ Private Routes  Routes 🚦💨 ~ //
+AuthRoutes.get("/private-auth", isAuthenticated , PrivateAuth )
+
 
 export default AuthRoutes;

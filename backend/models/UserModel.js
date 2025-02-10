@@ -89,7 +89,7 @@ userSchema.methods.isPasswordValid = async function (oldPassword) {
 
 // ☕︎ Generate JWT Token ☕︎ //
 userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ id: this._id }, process.env.JWTSECRETKEY);
+  const token = jwt.sign({ id: this._id }, process.env.JWTSECRETKEY , {expiresIn : "24h"});
   return token;
 };
 

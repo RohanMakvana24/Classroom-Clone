@@ -4,6 +4,7 @@ import ClassCard from "../component/ClassCard";
 import { Link } from "react-router-dom";
 import Navbar from "../component/layout/Navbar";
 import Sidebar from "../component/layout/Sidebar";
+import SidebarDesk from "../component/layout/SidebarDesk";
 const HomePage = () => {
   const styles = {
     heading: {
@@ -80,72 +81,7 @@ const HomePage = () => {
         {/* Main Content */}
         <div className="container-fluid">
           <div className="row">
-            <nav className="col-lg-2 d-none d-lg-block sidebar bg-light">
-              <ul className="nav flex-column">
-                <li className="nav-item">
-                  <a className="nav-link active" href="#">
-                    <i className="fas fa-home me-2" /> Home
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    <i className="fas fa-calendar-alt me-2" /> Calendar
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a
-                    className="nav-link"
-                    href="#teachingSubmenuDesktop"
-                    data-bs-toggle="collapse"
-                    role="button"
-                    aria-expanded="false"
-                    aria-controls="teachingSubmenuDesktop"
-                  >
-                    <i className="fas fa-chalkboard-teacher me-2" /> Teaching
-                    <i className="fas fa-caret-down float-end" />
-                  </a>
-                  <div className="collapse" id="teachingSubmenuDesktop">
-                    <ul className="nav flex-column ps-4">
-                      <li className="nav-item">
-                        <a className="nav-link" href="#">
-                          Assignments
-                        </a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link" href="#">
-                          Quizzes
-                        </a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link" href="#">
-                          Student Progress
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    <i className="fas fa-inbox me-2" /> To review
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    <i className="fas fa-user-circle me-2" /> Profile
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    <i className="fas fa-archive me-2" /> Archived classes
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    <i className="fas fa-cog me-2" /> Settings
-                  </a>
-                </li>
-              </ul>
-            </nav>
+           <SidebarDesk />
 
             <main className="col-lg-10 ms-auto px-6">
               <div className="container-fluid mt-4">
