@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 // ☕︎ User Schema with Methods ☕︎ //
 // ☕︎ Profile Schema ☕︎ //
 const profileSchema = new mongoose.Schema({
@@ -58,14 +58,14 @@ const userSchema = new mongoose.Schema(
     verificationToken: {
       type: String,
     },
-    isGoogleLogin :{
+    isGoogleLogin: {
       type: Boolean,
       enum: [true, false],
       default: false,
     },
-    otp : {
-      type : Number,
-      minlength : [6 , "OTP must be at least 6 digit"]
+    otp: {
+      type: Number,
+      minlength: [6, "OTP must be at least 6 digit"],
     },
     profile: profileSchema,
   },

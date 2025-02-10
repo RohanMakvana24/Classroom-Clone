@@ -72,10 +72,10 @@ const HomePage = () => {
     <>
       <div className="mainOP">
         {/* Navbar */}
-         <Navbar /> 
+        <Navbar />
 
         {/* Offcanvas Sidebar */}
-         <Sidebar /> 
+        <Sidebar />
 
         {/* Main Content */}
         <div className="container-fluid">
@@ -266,91 +266,91 @@ const HomePage = () => {
           </div>
         </div>
 
-      {/*  Join Class Modal */}
+        {/*  Join Class Modal */}
         <div
-        className="modal fade"
-        id="joinClassModal"
-        tabIndex="-1"
-        aria-labelledby="joinClassModal"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="joinClassModalLabel">
-                Join class
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <div className="mb-3">
-                <strong>You're currently signed in as</strong>
-                <div className="d-flex align-items-center mt-2">
-                  <div
-                    className="rounded-circle bg-primary text-white text-center"
-                    style={{ width: "40px", height: "40px" }}
-                  >
-                    <p style={{ color: "white", marginTop: "10px" }}> R </p>
-                  </div>
-                  <div className="ms-2">
-                    <p className="mb-0">Rohan Makvana</p>
-                    <small>rohanmakvana10@gmail.com</small>
-                  </div>
-                  <button type="button" className="btn btn-link ms-auto p-0">
-                    Switch account
-                  </button>
-                </div>
+          className="modal fade"
+          id="joinClassModal"
+          tabIndex="-1"
+          aria-labelledby="joinClassModal"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="joinClassModalLabel">
+                  Join class
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
               </div>
-
-              <div className="mb-3">
-                <label htmlFor="classCode" className="form-label">
-                  Class code
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="classCode"
-                  placeholder="Class code"
-                />
-                <div className="form-text">
-                  Ask your teacher for the class code, then enter it here.
+              <div className="modal-body">
+                <div className="mb-3">
+                  <strong>You're currently signed in as</strong>
+                  <div className="d-flex align-items-center mt-2">
+                    <div
+                      className="rounded-circle bg-primary text-white text-center"
+                      style={{ width: "40px", height: "40px" }}
+                    >
+                      <p style={{ color: "white", marginTop: "10px" }}> R </p>
+                    </div>
+                    <div className="ms-2">
+                      <p className="mb-0">Rohan Makvana</p>
+                      <small>rohanmakvana10@gmail.com</small>
+                    </div>
+                    <button type="button" className="btn btn-link ms-auto p-0">
+                      Switch account
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <p className="text-muted">
-                <strong>To sign in with a class code:</strong>
-                <ul className="mb-0">
-                  <li>Use an authorized account</li>
-                  <li>
-                    Use a class code with 5-7 letters or numbers, and no spaces
-                    or symbols
-                  </li>
-                </ul>
-              </p>
-              <a href="#" className="text-decoration-none">
-                Help Center article
-              </a>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button type="button" className="btn btn-primary">
-                Join
-              </button>
+                <div className="mb-3">
+                  <label htmlFor="classCode" className="form-label">
+                    Class code
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="classCode"
+                    placeholder="Class code"
+                  />
+                  <div className="form-text">
+                    Ask your teacher for the class code, then enter it here.
+                  </div>
+                </div>
+
+                <p className="text-muted">
+                  <strong>To sign in with a class code:</strong>
+                  <ul className="mb-0">
+                    <li>Use an authorized account</li>
+                    <li>
+                      Use a class code with 5-7 letters or numbers, and no
+                      spaces or symbols
+                    </li>
+                  </ul>
+                </p>
+                <a href="#" className="text-decoration-none">
+                  Help Center article
+                </a>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button type="button" className="btn btn-primary">
+                  Join
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
     </>
   );
