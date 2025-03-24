@@ -1,6 +1,6 @@
-import UserModel from "../models/UserModel";
-import uploadToCloudinary from "../utils/CloudinaryUploader";
-
+import UserModel from "../models/UserModel.js";
+import uploadToCloudinary from "../utils/CloudinaryUploader.js";
+import cloudinary from 'cloudinary'
 export const ChangeProfile = async (req, res) => {
   try {
     const id = req.params.id;
@@ -11,12 +11,21 @@ export const ChangeProfile = async (req, res) => {
       });
     }
 
-    const user = await UserModel.findById(id);
-    if (!user) {
+    const isuser = await UserModel.findById(id);
+    if (!isuser) {
       return res.status(400).json({
         success: false,
         message: "User not exist",
       });
+    }
+
+    // Profile public_id exist than delete old images
+    if(isuser.profile.public_id){
+        const result =  await cloudinary.v2.uploader.destroy(isuser.profile.public_id , (err)=>{
+          if(err){
+            console.log(err)
+          }
+       })
     }
 
     // ~ Profile Uploading
@@ -26,17 +35,17 @@ export const ChangeProfile = async (req, res) => {
     );
 
     // ~ Update Profile
-    const isChanged = await UserModel.findByIdAndUpdate(id, {
+    const user = await UserModel.findByIdAndUpdate(id, {
       profile: {
         url: fileDetails.secure_url,
         public_id: fileDetails.public_id,
       },
-    });
-
-    if (isChanged) {
+    }, { new: true } );
+    if (user) {
       return res.status(200).json({
         success: true,
         message: "Profile Updated Succefully",
+        user : user
       });
     } else {
       return res.status(400).json({

@@ -1,10 +1,14 @@
 import React, { useRef } from "react";
 import "../assets/css/homePage.css";
-
 import { Link } from "react-router-dom";
 import Navbar from "../component/layout/Navbar";
 import Sidebar from "../component/layout/Sidebar";
 import SidebarDesk from "../component/layout/SidebarDesk";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+// import toast from "react-hot-toast";
+import { toast } from "react-toastify";
+import { updateUser } from "../features/auth/authSlice";
 const ProfilePage = () => {
   const settingStyle = {
     container1: {
@@ -21,7 +25,6 @@ const ProfilePage = () => {
       width: "40px",
       height: "40px",
       borderRadius: "50%",
-      backgroundColor: "#e0e0e0",
       display: "inline-block",
       textAlign: "center",
       lineHeight: "40px",
@@ -41,14 +44,63 @@ const ProfilePage = () => {
     },
   };
 
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+
   const fileInputRef = useRef(null);
   const handleButtonclick = () => {
     fileInputRef.current.click();
   };
-  const handleFileChange = async(event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    
+    const fromData = new FormData();
+    fromData.append("profile", file);
+    const toastId = toast.loading("Profile Uploading...");
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_APP_BASE_URL}/api/v1/user/change-profile/${
+          user._id
+        }`,
+        fromData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      if (response.data.success) {
+        dispatch(updateUser(response.data.user));
+        toast.update(toastId, {
+          render: response.data.message,
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      } else {
+        toast.update(toastId, {
+          render: "Oops! Something went wrong. ❌",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        toast.update(toastId, {
+          render: error.response.data.message,
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      } else {
+        toast.update(toastId, {
+          render: "Oops! Something went wrong. ❌",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      }
+    }
   };
+
   return (
     <>
       <div className="mainOP">
@@ -74,7 +126,10 @@ const ProfilePage = () => {
                         marginBottom: "15px",
                       }}
                     >
-                      <div style={settingStyle.profilePicture}>R</div>
+                      <img
+                        style={settingStyle.profilePicture}
+                        src={`${user.profile.url}`}
+                      />
                       <a
                         onClick={handleButtonclick}
                         href="#"
@@ -84,6 +139,7 @@ const ProfilePage = () => {
                       </a>
                       <input
                         type="file"
+                        accept="image/*"
                         onChange={handleFileChange}
                         style={{ display: "none" }}
                         ref={fileInputRef}

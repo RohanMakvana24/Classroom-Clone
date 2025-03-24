@@ -10,7 +10,7 @@ import OTPTemplate from "../templates/otpTemplate.js";
 import bcrypt from "bcryptjs";
 import { oauth2Client } from "./../config/googleConfig.js";
 import axios from "axios";
-
+import cloudinary from 'cloudinary'
 // ⬟ Signup User Controller  ⬟ //
 export const SignupUser = async (req, res) => {
   try {
@@ -169,6 +169,18 @@ export const deleteUser = async (req, res) => {
       });
     }
 
+    const isuser = await UserModel.findById(u_id);
+    if (isuser.profile.public_id) {
+      const result = await cloudinary.v2.uploader.destroy(
+        isuser.profile.public_id,
+        (err) => {
+          if (err) {
+            console.log(err);
+          }
+        }
+      );
+    }
+
     const isDeleteUser = await UserModel.findByIdAndDelete(u_id);
     if (isDeleteUser) {
       return res.status(200).json({
@@ -182,7 +194,7 @@ export const deleteUser = async (req, res) => {
       });
     }
   } catch (error) {
-    console.loh(error);
+    console.log(error);
     res.status(504).json({
       success: false,
       message: error.message,
@@ -203,7 +215,7 @@ export const LoginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await UserModel.findOne({ email: email });
-    if(user.isGoogleLogin){
+    if (user.isGoogleLogin) {
       return res.status(400).json({
         success: false,
         message: "Already Login using the google login option...",
@@ -264,7 +276,7 @@ export const ForgotPassword = async (req, res) => {
     const { email } = req.body;
 
     const user = await UserModel.findOne({ email: email });
-    if(user.isGoogleLogin == true ){
+    if (user.isGoogleLogin == true) {
       return res.status(400).json({
         success: false,
         message: "Already Login using the google login option...",
@@ -499,11 +511,11 @@ export const GoogleLogin = async (req, res) => {
   }
 };
 
-export const PrivateAuth = async (req,res)=>{
+export const PrivateAuth = async (req, res) => {
   const user = req.user;
   return res.status(200).json({
-    success : true,
-    message : "Authentication Succefull",
-    isValid : true
-  })
-}
+    success: true,
+    message: "Authentication Succefull",
+    isValid: true,
+  });
+};

@@ -76,7 +76,6 @@ const Stream = () => {
         },
     };
     const [codePopUp, setCodePop] = useState(false);
-    console.log(codePopUp)
 
     const toggleCodePopUp = () => setCodePop(!codePopUp)
     return (

@@ -1,72 +1,111 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { deleteClass } from "../features/class/ClassSlice";
+import { toast } from "react-toastify";
+const ClassCard = ({ classId, title, students }) => {
+  const [image, setImage] = useState("");
+  const [rawImage, setRawImage] = useState("");
+  const isInitialRender = useRef(true);
+  const dispatch = useDispatch();
 
-const ClassCard = ({ title, students }) => {
+  const fetchStaticImage = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_BASE_URL}/api/v1/class/get-all-staticimages`
+      );
+      setRawImage(response.data.images);
+    } catch (error) {
+      console.error("Static Images API Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStaticImage();
+  }, []);
+
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false; // Skip initial render
+      return;
+    }
+
+    if (rawImage && rawImage.length > 0) {
+      // Get a random image object
+      const randomIndex = Math.floor(Math.random() * rawImage.length);
+      const randomImageObject = rawImage[randomIndex];
+
+      // Access the URL of the random image
+      setImage(randomImageObject.url);
+    } else {
+      console.error("The images array is empty.");
+    }
+  }, [rawImage]);
+
+  const handleDeletClass = async () => {
+    try {
+      const result = await dispatch(deleteClass(classId));
+      console.log(result);
+      // const toastClassDeleteId = toast.loading("Classs is deleting....");
+      // if (deleteClass.fulfilled.match(result)) {
+      //   toast.update(toastClassDeleteId ,  {
+      //     render : result.payload.message,
+
+      //   })
+      // } else {
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <div
-      className="card1"
-      style={{
-        background:
-          "url('https://static.vecteezy.com/system/resources/previews/004/965/420/non_2x/deer-in-the-forest-beautiful-sunset-scenery-illustration-free-vector.jpg')",
-        color: "white",
-        backgroundSize: "cover",
-        borderRadius: "7px",
-        overflow: "hidden",
-        boxShadow: "black 0px 0px 2px",
-        position: "relative",
-      }}
-    >
-      <div
-        className="card-body"
-        style={{
-          padding: "20px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          height: "150px",
-        }}
-      >
-        <h4
-          style={{ fontWeight: "bold", fontSize: "20px", margin: "0 0 10px" }}
-        >
-          {title}
-        </h4>
-        <p style={{ margin: "0", fontSize: "14px", color: "white" }}>
-          {students} students
-        </p>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
-        <div className="dropdown">
-          <i
-            className="fas fa-ellipsis-v"
-            style={{
-              fontSize: "20px",
-              color: "rgba(255, 255, 255, 0.7)",
-              cursor: "pointer",
-            }}
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          ></i>
-          <ul className="dropdown-menu dropdown-menu-end">
-            <li>
-              <a className="dropdown-item" href="#">
-                Edit
-              </a>
-            </li>
-            <li>
-              <a className="dropdown-item">Copy Invite Link </a>
-            </li>
-          </ul>
+    <div className="card text-white shadow-lg rounded-3 overflow-hidden">
+      <div className="position-relative">
+        <img
+          src={image}
+          className="card-img-top img-fluid"
+          alt="Class Background"
+          style={{ height: "200px", objectFit: "cover" }}
+        />
+        <div className="position-absolute top-0 end-0 p-2">
+          <div className="dropdown">
+            <i
+              className="fas fa-ellipsis-v text-dark fs-4"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style={{ cursor: "pointer" }}
+            ></i>
+            <ul className="dropdown-menu dropdown-menu-end">
+              <li>
+                <a className="dropdown-item" href="#">
+                  Edit
+                </a>
+              </li>
+              <li>
+                <a className="dropdown-item">Copy Invite Link</a>
+              </li>
+              <li>
+                <a className="dropdown-item" onClick={handleDeletClass}>
+                  Delete
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
+      <Link
+        to={`/one-class?classId=${classId}`}
+        className="card-body d-flex flex-column justify-content-between"
+      >
+        <Link
+          to={`/one-class?classId=${classId}`}
+          className="fw-bold text-dark mb-2"
+        >
+          {title}
+        </Link>
+        <p className="mb-0">{students} students</p>
+      </Link>
     </div>
   );
 };

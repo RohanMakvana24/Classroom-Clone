@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: [5, "The FullName must be at least 5 characters"],
     },
-    email: {
+    email: {    
       type: String,
       required: [true, "Email is required"],
       unique: true,
@@ -67,6 +67,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       minlength: [6, "OTP must be at least 6 digit"],
     },
+    classrooms: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Classes' }],
     profile: profileSchema,
   },
   {

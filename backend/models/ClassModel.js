@@ -1,33 +1,59 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
-const ClassSchema = new mongoose.Schema({
-  className: {
-    type: String,
-    required: [true, "Classname is required"],
-    trim: true,
-    minLength: [5, "className must be at least 5 character long"],
+const ClassSchema = new mongoose.Schema(
+  {
+    className: {
+      type: String,
+      required: [true, "Classname is required"],
+      trim: true,
+    },
+    section: {
+      type: String,
+      trim: true,
+    },
+    subject: {
+      type: String,
+      trim: true,
+    },
+    room: {
+      type: String,
+      trim: true,
+    },
+    code: {
+      type: String,
+      required: [true, "Class Code is required"],
+    },
+    teacher: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
+    students: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+      },
+    ],
+    assignments: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "assignments",
+    },
+    quizassignments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "quizassignments",
+      },
+    ],
+    materials: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Materials",
+    },
   },
-  section: {
-    type: String,
-    trim: true,
-    minLength: [5, "The Section must be aleast 5 character long"],
-  },
-  subject: {
-    type: String,
-    trim: true,
-    minLength: [5, "The Subject must be aleast 5 character long"],
-  },
-  room: {
-    type: String,
-    trim: true,
-  },
-  status: {
-    type: String,
-    enum: ["active", "inactive"],
-    default: "inactive",
-  },
-  classType: {
-    type: String,
-    enum: ["join", "create"],
-  },
-});
+  {
+    timestamps: true,
+  }
+);
+
+const ClassModel = mongoose.model("Classes", ClassSchema);
+
+export default ClassModel;
