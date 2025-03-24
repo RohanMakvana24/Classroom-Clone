@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { deleteClass } from "../features/class/ClassSlice";
 import { toast } from "react-toastify";
-const ClassCard = ({ classId, title, students }) => {
+const ClassCard = ({ classId, title, students , fetchClass }) => {
   const [image, setImage] = useState("");
   const [rawImage, setRawImage] = useState("");
   const isInitialRender = useRef(true);
@@ -44,20 +44,38 @@ const ClassCard = ({ classId, title, students }) => {
   }, [rawImage]);
 
   const handleDeletClass = async () => {
-    try {
       const result = await dispatch(deleteClass(classId));
-      console.log(result);
-      // const toastClassDeleteId = toast.loading("Classs is deleting....");
-      // if (deleteClass.fulfilled.match(result)) {
-      //   toast.update(toastClassDeleteId ,  {
-      //     render : result.payload.message,
-
-      //   })
-      // } else {
-      // }
-    } catch (error) {
-      console.log(error);
-    }
+      const toastClassDeleteId = toast.loading("Classs is deleting....");
+      if (deleteClass.fulfilled.match(result)) {
+        toast.update(toastClassDeleteId ,  {
+          render : result.payload.message,
+          type : "success",
+          theme : "colored",
+          isLoading : false,
+          autoClose: 3000,
+        })
+        fetchClass();
+      } else {
+        const errorData = result.payload?.message;
+        if(errorData){
+          toast.update(toastClassDeleteId , {
+            render : errorData ,
+            type : "error",
+            theme : "colored",
+            isLoading : false,
+            autoClose : 3000
+          })
+        }else{
+          toast.update(toastClassDeleteId , {
+            render : "Somenthin Went Wrong" ,
+            type : "error",
+            theme : "colored",
+            isLoading : false,
+            autoClose : 3000
+          })
+        }
+      }
+   
   };
   return (
     <div className="card text-white shadow-lg rounded-3 overflow-hidden">
