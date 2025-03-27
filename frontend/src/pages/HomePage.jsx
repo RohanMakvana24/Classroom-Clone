@@ -80,22 +80,21 @@ const HomePage = () => {
   const fetchClass = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_APP_BASE_URL}/api/v1/class/get-all-classes/${user._id
+        `${import.meta.env.VITE_APP_BASE_URL}/api/v1/class/get-all-classes/${
+          user._id
         }`
       );
       setClass(response.data.data);
     } catch (error) {
       console.log(error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchClass();
-  }, [user._id])
-
+  }, [user._id]);
 
   return (
     <>
@@ -113,37 +112,54 @@ const HomePage = () => {
             <main className="col-lg-10 ms-auto px-6">
               <div className="container-fluid mt-4">
                 <div className="row g-3">
-                  {loading ? (<div className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>)
-                    : Class.length > 0 ? (
-                      Class.map((classItem, idx) => (
-                        <div
-                          className="col-12 col-sm-6 col-md-4 col-lg-3"
-                          key={classItem._id} // Use a unique key from API
-                        >
-                          <ClassCard fetchClass={fetchClass}
-                            classId={classItem._id}
-                            title={classItem.className} // Assuming `name` is the class title
-                            students={classItem.studentCount || 0} // Assuming `studentCount` exists
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <div class="text-center">
-                      <img alt="Illustration of a window, a bird, a book, and other objects" class="mx-auto mb-4" height="200" src="https://storage.googleapis.com/a1aa/image/VQbP75YkCfD8QiZNMQ3y2bC7AGagw3x03eCimkzqaQg.jpg" width="200" />
-                      <p class="text-muted mb-4">
-                        Add a class to get started
-                      </p>
-                      <div class="d-flex justify-content-center gap-3">
-                        <a class="btn btn-primary" href="#">Create class</a>
-                        <a class="btn btn-primary" href="#">Join class</a>
+                  {loading ? (
+                    <div
+                      className="d-flex justify-content-center align-items-center"
+                      style={{ minHeight: "50vh" }}
+                    >
+                      <div
+                        className="spinner-border text-primary"
+                        role="status"
+                      >
+                        <span className="visually-hidden">Loading...</span>
                       </div>
                     </div>
-                    
-                    )}
+                  ) : Class.length > 0 ? (
+                    Class.map((classItem, idx) => (
+                      <div
+                        className="col-12 col-sm-6 col-md-4 col-lg-3"
+                        key={classItem._id} // Use a unique key from API
+                      >
+                        <ClassCard
+                          fetchClass={fetchClass}
+                          classId={classItem._id}
+                          title={classItem.className} // Assuming `name` is the class title
+                          students={classItem.studentCount || 0} // Assuming `studentCount` exists
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div class="text-center">
+                      <img
+                        alt="Illustration of a window, a bird, a book, and other objects"
+                        class="mx-auto mt-5 mb-4"
+                        height="140"
+                        src="https://img.freepik.com/premium-vector/beautiful-business-woman-working-laptop-illustration_96037-533.jpg?w=826"
+                        width="250"
+                      />
+                      <p class="text-muted mb-4">Add a class to get started</p>
+                      <div class="d-flex justify-content-center gap-3">
+                        <button
+                          class="btn btn-primary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#createClassModal"
+                        >
+                          Create class
+                        </button>
+                        <button class="btn btn-primary">Join class</button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </main>
